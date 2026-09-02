@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT Trading Academy</title>
+<style>
+:root{
+  --bg:#0F1217; --panel:#171B22; --panel2:#1D222B; --border:#2A303B;
+  --ink:#ECEDEF; --ink-dim:#9AA3B2; --ink-faint:#616B7A;
+  --bull:#34B583; --bear:#E2617A; --bull-zone:rgba(52,181,131,.16); --bear-zone:rgba(226,97,122,.16);
+  --zone:rgba(122,162,247,.14); --line:#7A8BA6; --accent:#E8B34C; --accent2:#6F8CE8;
+  --radius:10px; --radius-lg:16px;
+}
+[data-theme="light"]{
+  --bg:#F7F6F2; --panel:#FFFFFF; --panel2:#F0EFE9; --border:#E0DED4;
+  --ink:#1B1D22; --ink-dim:#5B6270; --ink-faint:#8B92A0;
+  --bull:#1F9C6C; --bear:#D14A63; --bull-zone:rgba(31,156,108,.12); --bear-zone:rgba(209,74,99,.12);
+  --zone:rgba(90,120,220,.10); --line:#9099A8; --accent:#B9791E; --accent2:#4C63C4;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  line-height:1.5; min-height:100vh;
+}
+h1,h2,h3,.serif{font-family:'Fraunces',Georgia,'Times New Roman',serif;}
+.mono{font-family:'IBM Plex Mono',ui-monospace,'SFMono-Regular',monospace;}
+a{color:inherit;}
+button{font-family:inherit; cursor:pointer;}
+::selection{background:var(--accent); color:#1B1D22;}
+
+/* header */
+header{
+  position:sticky; top:0; z-index:40; background:var(--bg);
+  border-bottom:1px solid var(--border);
+}
+.header-inner{
+  max-width:1100px; margin:0 auto; padding:14px 20px;
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+}
+.brand{display:flex; align-items:baseline; gap:10px; margin-right:auto;}
+.brand .mark{
+  font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:.02em;
+  color:var(--bg); background:var(--accent); padding:3px 7px; border-radius:5px; font-weight:600;
+}
+.brand .name{font-size:19px; font-weight:600;}
+nav.tabs{display:flex; gap:4px; flex-wrap:wrap;}
+nav.tabs button{
+  background:none; border:1px solid transparent; color:var(--ink-dim);
+  padding:8px 12px; border-radius:8px; font-size:14.5px; font-weight:500;
+}
+nav.tabs button:hover{color:var(--ink); background:var(--panel2);}
+nav.tabs button.active{color:var(--ink); background:var(--panel); border-color:var(--border);}
+#themeToggle{
+  background:var(--panel); border:1px solid var(--border); color:var(--ink);
+  width:36px; height:36px; border-radius:8px; font-size:16px; display:flex; align-items:center; justify-content:center;
+}
+
+main{max-width:1100px; margin:0 auto; padding:28px 20px 80px;}
+.screen{display:none;}
+.screen.active{display:block; animation:fadein .25s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+/* home */
+.hero{padding:38px 0 30px; border-bottom:1px solid var(--border); margin-bottom:30px;}
+.hero h1{font-size:42px; margin:0 0 8px; font-weight:600; letter-spacing:-.01em;}
+.hero p.sub{color:var(--ink-dim); font-size:18px; margin:0 0 26px; max-width:520px;}
+.hero-actions{display:flex; flex-wrap:wrap; gap:10px;}
+.btn{
+  border:1px solid var(--border); background:var(--panel); color:var(--ink);
+  padding:11px 18px; border-radius:9px; font-size:14.5px; font-weight:500;
+  display:inline-flex; align-items:center; gap:8px;
+}
+.btn:hover{border-color:var(--ink-faint);}
+.btn.primary{background:var(--accent); color:#20160A; border-color:var(--accent); font-weight:600;}
+.btn.primary:hover{filter:brightness(1.06);}
+.btn.small{padding:7px 12px; font-size:13px; border-radius:7px;}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+
+.section-label{
+  font-size:13px; color:var(--ink-faint); text-transform:none; margin:0 0 14px; font-weight:600;
+}
+.path{display:flex; flex-direction:column; gap:0;}
+.path-level{
+  display:grid; grid-template-columns:64px 1fr; gap:16px; padding:16px 0;
+  border-bottom:1px solid var(--border);
+}
+.path-level:last-child{border-bottom:none;}
+.path-num{font-family:'IBM Plex Mono',monospace; color:var(--ink-faint); font-size:13px; padding-top:3px;}
+.path-title{font-weight:600; margin:0 0 6px; font-size:16px;}
+.path-items{display:flex; flex-wrap:wrap; gap:6px;}
+.chip{
+  border:1px solid var(--border); background:var(--panel); color:var(--ink-dim);
+  padding:5px 10px; border-radius:20px; font-size:12.5px;
+}
+.chip.link{cursor:pointer;}
+.chip.link:hover{color:var(--ink); border-color:var(--ink-faint);}
+
+/* category grid */
+.cat-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px;}
+.cat-card{
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px; text-align:left; color:var(--ink);
+}
+.cat-card:hover{border-color:var(--ink-faint);}
+.cat-card .cname{font-weight:600; font-size:15px; margin-bottom:6px;}
+.cat-card .ccount{color:var(--ink-faint); font-size:12.5px;}
+.cat-card .cbar{height:4px; border-radius:2px; background:var(--border); margin-top:10px; overflow:hidden;}
+.cat-card .cbar > div{height:100%; background:var(--bull);}
+
+/* search */
+.searchbar{
+  display:flex; align-items:center; gap:10px; background:var(--panel);
+  border:1px solid var(--border); border-radius:9px; padding:10px 14px; margin-bottom:18px;
+}
+.searchbar input{
+  flex:1; background:none; border:none; outline:none; color:var(--ink); font-size:14.5px;
+}
+.searchbar input::placeholder{color:var(--ink-faint);}
+
+/* flashcards screen */
+.fc-toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:18px;}
+.fc-toolbar select{
+  background:var(--panel); border:1px solid var(--border); color:var(--ink);
+  padding:9px 12px; border-radius:8px; font-size:13.5px;
+}
+.fc-toolbar .spacer{flex:1;}
+.fc-progress{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-dim);}
+
+.card-stage{display:flex; flex-direction:column; align-items:center; gap:18px;}
+.flashcard{
+  width:100%; max-width:620px; min-height:340px; perspective:1400px; cursor:pointer;
+}
+.flashcard-inner{
+  position:relative; width:100%; height:100%; min-height:340px;
+  transform-style:preserve-3d; transition:transform .45s cubic-bezier(.4,.2,.2,1);
+}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.flashcard-face{
+  position:absolute; inset:0; backface-visibility:hidden;
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:34px; display:flex; flex-direction:column;
+}
+.flashcard-face.back{transform:rotateY(180deg); overflow-y:auto;}
+.fc-cat{font-size:12px; color:var(--accent2); font-weight:600; margin-bottom:14px;}
+.fc-term{font-size:34px; font-weight:600; font-family:'IBM Plex Mono',monospace; letter-spacing:-.01em;}
+.fc-full{font-size:15px; color:var(--ink-dim); margin-top:8px;}
+.fc-hint{margin-top:auto; color:var(--ink-faint); font-size:13px; display:flex; align-items:center; gap:6px;}
+.fc-mode-label{font-size:11.5px; font-weight:700; letter-spacing:.03em; color:var(--accent); margin-bottom:6px;}
+.fc-def{font-size:16.5px; margin:0 0 16px;}
+.fc-simple{
+  background:var(--panel2); border:1px dashed var(--border); border-radius:9px;
+  padding:14px 16px; font-size:15px; margin-top:auto;
+}
+.fc-simple b{color:var(--accent);}
+
+.fc-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;}
+.fc-know-row{display:flex; gap:10px; margin-top:4px;}
+.fc-know{border-color:var(--bull); color:var(--bull);}
+.fc-review{border-color:var(--bear); color:var(--bear);}
+.icon-btn{width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0; font-size:16px;}
+
+/* buttons row generic */
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+
+/* glossary list */
+.glossary-list{display:flex; flex-direction:column; gap:8px;}
+.gterm{
+  background:var(--panel); border:1px solid var(--border); border-radius:9px; padding:14px 16px;
+}
+.gterm summary{cursor:pointer; list-style:none; display:flex; align-items:center; gap:12px; font-weight:600;}
+.gterm summary::-webkit-details-marker{display:none;}
+.gterm summary .gt{font-family:'IBM Plex Mono',monospace; font-size:15px;}
+.gterm summary .gc{font-size:11.5px; color:var(--ink-faint); font-weight:500; margin-left:auto;}
+.gterm .gbody{padding-top:12px; color:var(--ink-dim); font-size:14.5px;}
+.gterm .gbody .simple{margin-top:8px; padding:10px 12px; background:var(--panel2); border-radius:7px; font-size:14px;}
+
+/* visual lessons */
+.demo-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; margin-bottom:10px;}
+.demo-card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:16px; text-align:left;}
+.demo-card:hover{border-color:var(--ink-faint);}
+.demo-card .dtitle{font-weight:600; font-size:15px; margin-bottom:6px;}
+.demo-card .dtags{font-size:12px; color:var(--ink-faint);}
+
+.demo-viewer{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px;}
+.demo-header{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+.demo-header h3{margin:0; font-size:20px;}
+.panels{display:grid; gap:14px; margin-bottom:14px;}
+.panels.p1{grid-template-columns:1fr;}
+.panels.p2{grid-template-columns:1fr 1fr;}
+@media(max-width:640px){.panels.p2{grid-template-columns:1fr;}}
+.panel-wrap{background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:10px;}
+.panel-label{font-size:12px; color:var(--ink-faint); margin-bottom:4px; font-weight:600;}
+.ict-chart{width:100%; height:auto; display:block;}
+.chart-label{fill:var(--ink); font-size:9px; font-family:'IBM Plex Mono',monospace;}
+.caption{background:var(--panel2); border-radius:9px; padding:14px 16px; font-size:15px; margin-bottom:14px; min-height:20px;}
+.demo-controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.step-dots{display:flex; gap:5px; margin-left:6px;}
+.step-dots span{width:7px; height:7px; border-radius:50%; background:var(--border);}
+.step-dots span.on{background:var(--accent);}
+.speed-select{background:var(--panel); border:1px solid var(--border); color:var(--ink); border-radius:7px; padding:6px 8px; font-size:12.5px;}
+
+/* timeline widget */
+.timeline{position:relative; height:70px; background:var(--panel2); border-radius:9px; border:1px solid var(--border); margin:6px 0;}
+.timeline .seg{position:absolute; top:14px; bottom:14px; border-radius:5px;}
+.timeline .ticks{position:absolute; inset:0; display:flex;}
+.timeline .ticks div{flex:1; border-right:1px solid var(--border);}
+.timeline .seg-label{position:absolute; top:-20px; font-size:11px; font-weight:600; white-space:nowrap;}
+
+/* quiz */
+.quiz-shell{max-width:620px; margin:0 auto;}
+.quiz-progress{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; font-size:13px; color:var(--ink-dim);}
+.quiz-q{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px;}
+.quiz-q h3{margin:0 0 20px; font-size:19px; font-weight:600;}
+.quiz-choices{display:flex; flex-direction:column; gap:10px;}
+.qchoice{
+  text-align:left; background:var(--panel2); border:1px solid var(--border); border-radius:9px;
+  padding:13px 16px; font-size:14.5px; color:var(--ink);
+}
+.qchoice:hover{border-color:var(--ink-faint);}
+.qchoice.correct{border-color:var(--bull); background:var(--bull-zone); color:var(--bull);}
+.qchoice.wrong{border-color:var(--bear); background:var(--bear-zone); color:var(--bear);}
+.qchoice:disabled{cursor:default;}
+.quiz-explain{margin-top:16px; padding:14px 16px; background:var(--panel2); border-radius:9px; font-size:14px; display:none;}
+.quiz-explain.show{display:block;}
+.quiz-result{text-align:center; padding:40px 20px;}
+.quiz-result .score{font-size:52px; font-weight:700; font-family:'IBM Plex Mono',monospace; margin:14px 0;}
+.chart-click-area{cursor:pointer; opacity:0;}
+
+/* progress dashboard */
+.stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:28px;}
+.stat{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px;}
+.stat .num{font-size:30px; font-weight:700; font-family:'IBM Plex Mono',monospace;}
+.stat .lbl{color:var(--ink-dim); font-size:13px; margin-top:4px;}
+.progress-bar{height:8px; background:var(--panel2); border-radius:4px; overflow:hidden; margin-top:6px;}
+.progress-bar > div{height:100%; background:var(--bull);}
+.cat-progress-row{display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid var(--border);}
+.cat-progress-row:last-child{border-bottom:none;}
+.cat-progress-row .cname{width:190px; flex-shrink:0; font-size:14px; font-weight:500;}
+.cat-progress-row .progress-bar{flex:1;}
+.cat-progress-row .pct{width:44px; text-align:right; font-size:12.5px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace;}
+
+.empty{color:var(--ink-faint); padding:30px 0; text-align:center; font-size:14.5px;}
+.footnote{color:var(--ink-faint); font-size:12.5px; margin-top:10px; line-height:1.6;}
+</style>
+</head>
+<body data-theme="dark">
+
+<header>
+  <div class="header-inner">
+    <div class="brand"><span class="mark">ICT</span><span class="name serif">Trading Academy</span></div>
+    <nav class="tabs" id="tabs">
+      <button data-screen="home" class="active">Home</button>
+      <button data-screen="flashcards">Flashcards</button>
+      <button data-screen="visual">Visual Lessons</button>
+      <button data-screen="quiz">Quiz</button>
+      <button data-screen="glossary">Glossary</button>
+      <button data-screen="progress">My Progress</button>
+    </nav>
+    <button id="themeToggle" title="Toggle dark / light">🌙</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section class="screen active" id="screen-home">
+    <div class="hero">
+      <h1>ICT Trading Academy</h1>
+      <p class="sub">Learn ICT concepts one card at a time.</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-goto="flashcards">Start Learning</button>
+        <button class="btn" data-goto="flashcards">Flashcards</button>
+        <button class="btn" data-goto="visual">Visual Lessons</button>
+        <button class="btn" data-goto="quiz">Quiz</button>
+        <button class="btn" data-goto="glossary">Glossary</button>
+        <button class="btn" data-goto="progress">My Progress</button>
+      </div>
+    </div>
+    <p class="section-label">Recommended Learning Path</p>
+    <div class="path" id="learningPath"></div>
+    <p class="footnote">Everything on this site is for learning terminology and concepts only — it is not trading advice, and nothing here is a signal to buy or sell anything. ICT terminology comes from a large, informally-documented body of teaching; where a term has more than one common interpretation, that's noted on the card.</p>
+  </section>
+
+  <!-- FLASHCARDS -->
+  <section class="screen" id="screen-flashcards">
+    <div class="searchbar">
+      <span>🔍</span>
+      <input type="text" id="fcSearch" placeholder="Search every term and definition…">
+    </div>
+    <div class="fc-toolbar">
+      <select id="fcCategory"></select>
+      <label class="row" style="font-size:13.5px; color:var(--ink-dim); gap:6px;">
+        <input type="checkbox" id="fcSimpleToggle"> Super Simple Mode
+      </label>
+      <div class="spacer"></div>
+      <span class="fc-progress" id="fcProgressText">0 / 0</span>
+    </div>
+    <div id="fcCategoryPicker" class="cat-grid" style="margin-bottom:20px;"></div>
+    <div id="fcStudyArea" style="display:none;">
+      <div class="row" style="margin-bottom:14px;">
+        <button class="btn small" id="fcBackToCats">← All categories</button>
+        <button class="btn small" id="fcShuffle">🔀 Shuffle</button>
+        <button class="btn small" id="fcRestart">↺ Restart category</button>
+      </div>
+      <div class="card-stage">
+        <div class="flashcard" id="flashcard">
+          <div class="flashcard-inner">
+            <div class="flashcard-face front">
+              <div class="fc-cat" id="cardCatFront"></div>
+              <div class="fc-term" id="cardTermFront"></div>
+              <div class="fc-full" id="cardFullFront"></div>
+              <div class="fc-hint">Tap the card or press "Flip Card" to see the answer</div>
+            </div>
+            <div class="flashcard-face back">
+              <div class="fc-cat" id="cardCatBack"></div>
+              <div class="fc-mode-label">Normal explanation</div>
+              <p class="fc-def" id="cardDefBack"></p>
+              <div class="fc-simple"><b>Super simple:</b> <span id="cardSimpleBack"></span></div>
+              <button class="btn small" id="cardDemoLink" style="margin-top:12px; display:none;">▶ See the visual lesson</button>
+            </div>
+          </div>
+        </div>
+        <div class="fc-controls">
+          <button class="btn" id="fcPrev">← Previous</button>
+          <button class="btn primary" id="fcFlip">Flip Card</button>
+          <button class="btn" id="fcNext">Next →</button>
+        </div>
+        <div class="fc-know-row">
+          <button class="btn fc-review" id="fcReviewAgain">↻ Review Again</button>
+          <button class="btn fc-know" id="fcIKnow">✓ I Know This</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISUAL LESSONS -->
+  <section class="screen" id="screen-visual">
+    <p class="section-label">Visual Lessons — click "Show me" and step through each chart</p>
+    <div class="demo-grid" id="demoGrid"></div>
+    <div id="demoViewer" style="display:none;"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="screen-quiz">
+    <div class="quiz-shell" id="quizShell"></div>
+  </section>
+
+  <!-- GLOSSARY -->
+  <section class="screen" id="screen-glossary">
+    <div class="searchbar">
+      <span>🔍</span>
+      <input type="text" id="glSearch" placeholder="Search the full glossary…">
+    </div>
+    <div class="row" style="margin-bottom:16px;">
+      <select id="glCategory"><option value="">All categories</option></select>
+    </div>
+    <div class="glossary-list" id="glossaryList"></div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="screen" id="screen-progress">
+    <p class="section-label">My Progress</p>
+    <div class="stat-grid" id="statGrid"></div>
+    <h3 style="margin:0 0 10px; font-size:17px;">Progress by category</h3>
+    <div id="catProgressList" style="background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:6px 16px; margin-bottom:26px;"></div>
+    <h3 style="margin:0 0 10px; font-size:17px;">Terms marked "Review Again"</h3>
+    <div id="reviewList" class="glossary-list" style="margin-bottom:20px;"></div>
+    <button class="btn small" id="resetProgress">Reset all progress</button>
+  </section>
+
+</main>
+
+<script>
+/* ============================= DATA ============================= */
+const CATEGORIES = ["Core Market Concepts","Liquidity","Highs & Lows","Market Structure","Liquidity Runs",
+"Fair Value Gaps & Imbalances","Order Blocks","PD Arrays","Premium & Discount","OTE","Dealing Ranges",
+"Time & Sessions","ICT Trading Models","SMT & Correlation","Institutional Concepts","Timeframes",
+"Candlestick Terms","Supply & Demand","Entry & Trade Terminology","Advanced ICT Concepts"];
+
+const TERMS = [
+{id:"ict",term:"ICT",full:"Inner Circle Trader",cat:"Core Market Concepts",
+ normal:"ICT stands for Inner Circle Trader — the name of the trading methodology (and its creator), which focuses on how large institutions move price through liquidity and price-delivery concepts.",
+ simple:"ICT is a way of reading charts. It focuses on how big players — banks and funds — move price around to grab orders before heading where they really want to go."},
+{id:"price",term:"Price",cat:"Core Market Concepts",level:1,
+ normal:"Price is the current value the market is trading at, shown as a constantly updating line or set of candles on a chart.",
+ simple:"Price is just the number people are buying and selling at right now. It goes up when more people want to buy, and down when more people want to sell."},
+{id:"trend",term:"Trend",cat:"Core Market Concepts",level:1,
+ normal:"A trend is the general direction price is moving over time — up (bullish), down (bearish), or sideways (ranging).",
+ simple:"A trend is which way the market is walking. Up trend = price is climbing. Down trend = price is falling. Sideways = price is just wandering."},
+
+{id:"liquidity",term:"Liquidity",cat:"Liquidity",level:1,
+ normal:"Liquidity refers to areas where orders are concentrated — clusters of resting buy or sell orders, often stop-losses or pending entries.",
+ simple:"Liquidity is a spot on the chart where lots of traders have orders waiting, like stop-losses. Price often gets pulled toward these spots."},
+{id:"bsl",term:"BSL",full:"Buy-Side Liquidity",cat:"Liquidity",level:3,demo:"buy-sell-side-liquidity",
+ normal:"Buy-side liquidity is liquidity resting above significant highs.",
+ simple:"Imagine lots of traders put their stop orders above this high. Price may go up there, trigger those orders, and then come back down."},
+{id:"ssl",term:"SSL",full:"Sell-Side Liquidity",cat:"Liquidity",level:3,demo:"buy-sell-side-liquidity",
+ normal:"Sell-side liquidity is liquidity resting below significant lows.",
+ simple:"Imagine lots of traders put their stop orders below this low. Price may dip down there, trigger those orders, and then bounce back up."},
+{id:"dol",term:"DOL",full:"Draw on Liquidity",cat:"Liquidity",level:3,demo:"inducement-dol-irl-erl",
+ normal:"Draw on Liquidity is the price level or zone that price appears to be 'drawn' toward — usually a pool of resting orders.",
+ simple:"DOL is just the target price seems to be heading toward — often an old high or low with lots of orders sitting there."},
+{id:"irl",term:"IRL",full:"Internal Range Liquidity",cat:"Liquidity",level:8,demo:"inducement-dol-irl-erl",
+ normal:"Internal Range Liquidity is liquidity resting inside a defined dealing range, such as small highs/lows, gaps, or order blocks between the range's top and bottom.",
+ simple:"IRL is liquidity sitting INSIDE a trading range — little highs, lows, and gaps tucked between the range's top and bottom."},
+{id:"erl",term:"ERL",full:"External Range Liquidity",cat:"Liquidity",level:8,demo:"inducement-dol-irl-erl",
+ normal:"External Range Liquidity is liquidity resting outside a defined dealing range, such as the obvious high and low beyond it.",
+ simple:"ERL is liquidity sitting OUTSIDE a trading range — the obvious highs and lows everyone can see above and below it."},
+{id:"tliq",term:"TLIQ",full:"Trendline Liquidity",cat:"Liquidity",
+ normal:"Trendline liquidity is liquidity that builds up along a drawn trendline, since traders often place stops just beyond it.",
+ simple:"Traders love drawing trendlines and placing stops near them — TLIQ is just liquidity that gathers along that line."},
+
+{id:"swing-high",term:"Swing High",cat:"Highs & Lows",level:1,
+ normal:"A swing high is a local high where price turns downward.",
+ simple:"A swing high is a candle with lower candles on both sides of it — a little peak on the chart."},
+{id:"swing-low",term:"Swing Low",cat:"Highs & Lows",level:1,
+ normal:"A swing low is a local low where price turns upward.",
+ simple:"A swing low is a candle with higher candles on both sides of it — a little dip on the chart."},
+{id:"eqh",term:"EQH",full:"Equal Highs",cat:"Highs & Lows",level:3,demo:"equal-highs-lows",
+ normal:"Equal highs are multiple highs sitting at approximately the same price.",
+ simple:"Equal highs are two or more peaks sitting at almost the same price. Traders often park stop orders just above them."},
+{id:"eql",term:"EQL",full:"Equal Lows",cat:"Highs & Lows",level:3,demo:"equal-highs-lows",
+ normal:"Equal lows are multiple lows sitting at approximately the same price.",
+ simple:"Equal lows are two or more dips sitting at almost the same price. Traders often park stop orders just below them."},
+{id:"pdh",term:"PDH",full:"Previous Day High",cat:"Highs & Lows", normal:"PDH is the highest price reached during the previous trading day.", simple:"PDH is simply yesterday's highest price."},
+{id:"pdl",term:"PDL",full:"Previous Day Low",cat:"Highs & Lows", normal:"PDL is the lowest price reached during the previous trading day.", simple:"PDL is simply yesterday's lowest price."},
+{id:"pwh",term:"PWH",full:"Previous Week High",cat:"Highs & Lows", normal:"PWH is the highest price reached during the previous trading week.", simple:"PWH is the highest price from last week."},
+{id:"pwl",term:"PWL",full:"Previous Week Low",cat:"Highs & Lows", normal:"PWL is the lowest price reached during the previous trading week.", simple:"PWL is the lowest price from last week."},
+{id:"pmh",term:"PMH",full:"Previous Month High",cat:"Highs & Lows", normal:"PMH is the highest price reached during the previous trading month.", simple:"PMH is the highest price from last month."},
+{id:"pml",term:"PML",full:"Previous Month Low",cat:"Highs & Lows", normal:"PML is the lowest price reached during the previous trading month.", simple:"PML is the lowest price from last month."},
+{id:"hh",term:"HH",full:"Higher High",cat:"Highs & Lows",level:2,
+ normal:"A higher high is a swing high that is higher than the swing high before it — a sign of bullish structure.",
+ simple:"Each new peak is taller than the last peak. That's a higher high."},
+{id:"hl",term:"HL",full:"Higher Low",cat:"Highs & Lows",level:2,
+ normal:"A higher low is a swing low that is higher than the swing low before it — also a sign of bullish structure.",
+ simple:"Each new dip doesn't go as low as the last dip. That's a higher low."},
+{id:"lh",term:"LH",full:"Lower High",cat:"Highs & Lows",level:2,
+ normal:"A lower high is a swing high that is lower than the swing high before it — a sign of bearish structure.",
+ simple:"Each new peak is shorter than the last peak. That's a lower high."},
+{id:"ll",term:"LL",full:"Lower Low",cat:"Highs & Lows",level:2,
+ normal:"A lower low is a swing low that is lower than the swing low before it — also a sign of bearish structure.",
+ simple:"Each new dip goes lower than the last dip. That's a lower low."},
+
+{id:"bos",term:"BOS",full:"Break of Structure",cat:"Market Structure",level:2,demo:"market-structure-bos-mss",
+ normal:"BOS refers to price breaking a prior high or low in the direction of the current trend, confirming the trend is continuing.",
+ simple:"BOS just means price broke past an old high or low in the direction it was already going — the trend is continuing."},
+{id:"mss",term:"MSS",full:"Market Structure Shift",cat:"Market Structure",level:2,demo:"market-structure-bos-mss",
+ normal:"MSS refers to price breaking structure in a way that suggests the prevailing trend may be changing direction.",
+ simple:"MSS means price broke structure in a way that hints the trend itself might be turning around."},
+{id:"choch",term:"CHoCH",full:"Change of Character",cat:"Market Structure",level:2,
+ normal:"Change of Character is the first sign that the character of price action is shifting, often the earliest hint of a possible trend change.",
+ simple:"CHoCH is like the market clearing its throat right before it changes its mind about direction."},
+{id:"displacement",term:"Displacement",cat:"Market Structure",level:2,demo:"market-structure-bos-mss",
+ normal:"Displacement is a strong, aggressive price movement, usually shown as one or more large candles.",
+ simple:"Displacement is a big, fast, aggressive candle (or run of candles) that shows real buying or selling pressure just stepped in."},
+
+{id:"liquidity-sweep",term:"Liquidity Sweep",cat:"Liquidity Runs",level:3,demo:"liquidity-sweep",
+ normal:"A liquidity sweep occurs when price moves through a known high or low to take the resting liquidity there.",
+ simple:"Price pokes just past an old high or low, grabs the orders sitting there, and often turns back the other way."},
+{id:"stop-run",term:"Stop Run",cat:"Liquidity Runs",level:3,demo:"turtle-soup-stop-run",
+ normal:"A stop run is a move through an obvious high or low that triggers the stop orders resting there.",
+ simple:"A stop run is when price pokes through an obvious high or low just far enough to trigger the stop orders sitting there."},
+{id:"lrlr",term:"LRLR",full:"Low Resistance Liquidity Run",cat:"Liquidity Runs",demo:"lrlr-vs-hrlr",
+ normal:"A low resistance liquidity run describes a path where price can move toward a target smoothly, without much opposing order flow slowing it down.",
+ simple:"Low resistance means the road is clear — price can glide toward its target without much of a fight along the way."},
+{id:"hrlr",term:"HRLR",full:"High Resistance Liquidity Run",cat:"Liquidity Runs",demo:"lrlr-vs-hrlr",
+ normal:"A high resistance liquidity run describes a path where price meets a lot of opposing orders, often causing a sharp reaction when that liquidity is finally taken.",
+ simple:"High resistance means there's a wall of orders in the way — when price finally breaks through, it often reacts hard."},
+{id:"ts",term:"TS",full:"Trendline Sweep",cat:"Liquidity Runs",
+ normal:"A trendline sweep is when price briefly pushes through a visible trendline to grab the liquidity resting there, then reverses.",
+ simple:"Traders like to draw trendlines and place stops near them. A trendline sweep is price poking through that line just to grab those orders."},
+{id:"inducement",term:"Inducement",cat:"Liquidity Runs",level:3,demo:"inducement-dol-irl-erl",
+ normal:"Inducement is an early, smaller high or low designed to lure traders in before the real liquidity point is taken.",
+ simple:"Inducement is a small fake-out that tricks early traders into jumping in, right before the real move happens."},
+{id:"turtle-soup",term:"Turtle Soup",cat:"Liquidity Runs",level:7,demo:"turtle-soup-stop-run",
+ normal:"Turtle Soup is a setup involving a break of a prior high or low followed by a reversal, trapping breakout traders.",
+ simple:"Price breaks below an old low (looks like the trend is continuing down) but then quickly flips and reverses back up — trapping the breakout traders."},
+
+{id:"fvg",term:"FVG",full:"Fair Value Gap",cat:"Fair Value Gaps & Imbalances",level:4,demo:"fair-value-gap",
+ normal:"A Fair Value Gap is a three-candle imbalance where the wick of the first candle doesn't overlap the wick of the third, leaving a gap.",
+ simple:"An FVG is a small gap left behind by a fast move — one candle skips over a price area without much trading there. Price sometimes comes back to 'fill' that gap."},
+{id:"bisi",term:"BISI",full:"Buy-Side Imbalance, Sell-Side Inefficiency",cat:"Fair Value Gaps & Imbalances",
+ normal:"BISI describes a bullish fair value gap: an imbalance created during an up move that marks a spot buyers may return to.",
+ simple:"BISI is a bullish fair value gap — it forms during an up move and marks a spot buyers may come back to."},
+{id:"sibi",term:"SIBI",full:"Sell-Side Imbalance, Buy-Side Inefficiency",cat:"Fair Value Gaps & Imbalances",
+ normal:"SIBI describes a bearish fair value gap: an imbalance created during a down move that marks a spot sellers may return to.",
+ simple:"SIBI is a bearish fair value gap — it forms during a down move and marks a spot sellers may come back to."},
+{id:"ce",term:"CE",full:"Consequent Encroachment",cat:"Fair Value Gaps & Imbalances",
+ normal:"Consequent Encroachment is generally the 50% midpoint of an imbalance — a level many traders watch closely.",
+ simple:"CE is just the halfway point of a gap. Many traders watch this midpoint as a key level."},
+{id:"ifvg",term:"IFVG",full:"Inverse Fair Value Gap",cat:"Fair Value Gaps & Imbalances",level:4,demo:"inverse-fvg",
+ normal:"An Inverse FVG is a fair value gap that has been broken through; once violated, it can begin acting in the opposite role.",
+ simple:"An IFVG is a fair value gap that gets broken through — once that happens, it can start acting the opposite way it did before."},
+{id:"bpr",term:"BPR",full:"Balanced Price Range",cat:"Fair Value Gaps & Imbalances",level:4,demo:"breaker-mitigation-bpr",
+ normal:"A Balanced Price Range is a zone where a bullish and a bearish fair value gap overlap, creating a balanced area that can act as support or resistance.",
+ simple:"A BPR is a spot where a bullish gap and a bearish gap overlap each other, creating an extra-notable zone."},
+
+{id:"ob",term:"OB",full:"Order Block",cat:"Order Blocks",level:4,demo:"order-block",
+ normal:"An Order Block is the last candle (or small cluster of candles) moving one direction right before a strong opposite move — marking roughly where large orders may have entered.",
+ simple:"An order block is the last candle moving one way right before a strong move the other way — it marks roughly where big orders may have entered."},
+{id:"breaker",term:"Breaker Block",cat:"Order Blocks",level:4,demo:"breaker-mitigation-bpr",
+ normal:"A Breaker Block is an order block that fails and can subsequently act in the opposite role.",
+ simple:"A breaker block is an order block that got broken. Once it fails, it can flip and start working in the opposite direction."},
+{id:"mitigation",term:"Mitigation Block",cat:"Order Blocks",level:4,demo:"breaker-mitigation-bpr",
+ normal:"A Mitigation Block is an area associated with prior order flow that price returns to, allowing traders on the wrong side there to exit at a better price.",
+ simple:"A mitigation block is a zone price returns to later, so traders who got caught on the wrong side there can exit at a better price."},
+
+{id:"pd-array",term:"PD Array",full:"Premium/Discount Array",cat:"PD Arrays",
+ normal:"A PD Array is a general term for the reference zones ICT traders use — like order blocks, fair value gaps, or liquidity pools — to plan trades around premium and discount.",
+ simple:"A PD Array is just a general name for any of the reference zones ICT traders use to plan a trade — order blocks, gaps, liquidity pools, and so on."},
+
+{id:"premium",term:"Premium",cat:"Premium & Discount",level:5,demo:"premium-discount-equilibrium",
+ normal:"Premium is the upper half of a defined dealing range.",
+ simple:"Premium is the top half of a range — prices here are considered 'expensive,' a place sellers may prefer to sell."},
+{id:"discount",term:"Discount",cat:"Premium & Discount",level:5,demo:"premium-discount-equilibrium",
+ normal:"Discount is the lower half of a defined dealing range.",
+ simple:"Discount is the bottom half of a range — prices here are considered 'cheap,' a place buyers may prefer to buy."},
+{id:"equilibrium",term:"Equilibrium",cat:"Premium & Discount",level:5,demo:"premium-discount-equilibrium",
+ normal:"Equilibrium is the 50% midpoint of a dealing range.",
+ simple:"Equilibrium is the exact middle of a range — the 50% line that splits premium from discount."},
+
+{id:"ote",term:"OTE",full:"Optimal Trade Entry",cat:"OTE",level:5,demo:"ote",
+ normal:"Optimal Trade Entry refers to a specific retracement zone (roughly the 62%–79% region) that price often pulls back into before continuing its move.",
+ simple:"OTE is a specific 'sweet spot' zone that price often pulls back into before continuing — many traders look to enter trades there."},
+
+{id:"dealing-range",term:"Dealing Range",cat:"Dealing Ranges",level:5,demo:"dealing-range",
+ normal:"A Dealing Range is a defined high-to-low range used to analyze price, including its premium, discount, and equilibrium.",
+ simple:"A dealing range is just the box between a recent high and a recent low that traders use to measure premium, discount, and equilibrium."},
+
+{id:"kill-zone",term:"Kill Zone",cat:"Time & Sessions",level:6,demo:"kill-zones",
+ normal:"A Kill Zone is a specific trading-session time window emphasized in ICT, when institutional activity is thought to increase.",
+ simple:"A kill zone is a specific window of the trading day when ICT traders pay extra attention, because big institutional moves tend to happen then."},
+{id:"london-kz",term:"London Kill Zone",cat:"Time & Sessions",level:6,demo:"kill-zones",
+ normal:"The London Kill Zone is ICT's London-session trading window, commonly watched for early-session setups.",
+ simple:"This is the time window during the London trading session that ICT traders watch closely."},
+{id:"ny-kz",term:"New York Kill Zone",cat:"Time & Sessions",level:6,demo:"kill-zones",
+ normal:"The New York Kill Zone is ICT's New York-session trading window, commonly watched for setups around the U.S. open.",
+ simple:"This is the time window during the New York trading session that ICT traders watch closely."},
+{id:"daily-open",term:"Daily Open",cat:"Time & Sessions",level:6, normal:"The Daily Open is the day's opening price, often used as a reference level.", simple:"The daily open is simply the price where today's trading day began."},
+{id:"weekly-open",term:"Weekly Open",cat:"Time & Sessions",level:6, normal:"The Weekly Open is the week's opening price, often used as a reference level.", simple:"The weekly open is the price where this week's trading began."},
+{id:"monthly-open",term:"Monthly Open",cat:"Time & Sessions",level:6, normal:"The Monthly Open is the month's opening price, often used as a reference level.", simple:"The monthly open is the price where this month's trading began."},
+{id:"midnight-open",term:"Midnight Open",cat:"Time & Sessions",level:6, normal:"The Midnight Open is the ICT-defined midnight (New York time) reference price.", simple:"The midnight open is the price at midnight, New York time — another key reference point ICT traders use."},
+
+{id:"amd",term:"AMD",full:"Accumulation, Manipulation, Distribution",cat:"ICT Trading Models",level:7,demo:"amd-po3-judas",
+ normal:"AMD describes a three-phase cycle in price delivery: Accumulation (a quiet range), Manipulation (a fake move), and Distribution (the real, larger move).",
+ simple:"AMD describes a 3-part cycle: price first sits quietly building orders (Accumulation), then fakes a move to trap traders (Manipulation), then makes its real move (Distribution)."},
+{id:"po3",term:"PO3",full:"Power of Three",cat:"ICT Trading Models",level:7,demo:"amd-po3-judas",
+ normal:"Power of Three refers to the same accumulation–manipulation–distribution cycle, viewed as the three-part 'power' behind how a session unfolds.",
+ simple:"PO3 is another name for the same 3-step accumulation, manipulation, distribution cycle."},
+{id:"judas-swing",term:"Judas Swing",cat:"ICT Trading Models",level:7,demo:"amd-po3-judas",
+ normal:"A Judas Swing is a deceptive move early in a session that may take liquidity before the larger move begins.",
+ simple:"A Judas swing is a fake early move — like a trick — that grabs liquidity before the market turns and makes its real move."},
+{id:"silver-bullet",term:"Silver Bullet",cat:"ICT Trading Models",level:7,
+ normal:"Silver Bullet refers to a specific ICT setup that looks for a fair value gap forming within a narrow one-hour kill-zone window, used as a focused entry model. Note: exact rules vary between ICT sources — this is the commonly taught version.",
+ simple:"Silver Bullet is a specific short time window where traders watch closely for one particular kind of setup (a fair value gap) to appear."},
+
+{id:"smt",term:"SMT",full:"Smart Money Technique / SMT Divergence",cat:"SMT & Correlation",level:7,demo:"smt-divergence",
+ normal:"SMT Divergence occurs when two correlated markets fail to confirm each other's move — one makes a new high or low while the other doesn't — often flagged as a possible reversal signal.",
+ simple:"SMT is when two related markets don't move the same way at the same time — one makes a new high or low and the other doesn't. That mismatch can hint at a reversal."},
+
+{id:"ipda",term:"IPDA",full:"Interbank Price Delivery Algorithm",cat:"Institutional Concepts",level:8,
+ normal:"IPDA refers to the idea that price is delivered through an algorithm-like process that references specific lookback ranges to seek out liquidity.",
+ simple:"IPDA is the idea that price is delivered by an algorithm-like process that looks back over certain time ranges to decide where to seek liquidity next."},
+{id:"nwog",term:"NWOG",full:"New Week Opening Gap",cat:"Institutional Concepts",
+ normal:"NWOG is the gap between the closing price on Friday and the opening price the following Monday.",
+ simple:"NWOG is the small price gap between Friday's close and the next Monday's open."},
+{id:"ndog",term:"NDOG",full:"New Day Opening Gap",cat:"Institutional Concepts",
+ normal:"NDOG is the gap between the previous day's close and the current day's open.",
+ simple:"NDOG is the small price gap between yesterday's close and today's open."},
+
+{id:"htf",term:"HTF",full:"Higher Time Frame",cat:"Timeframes",
+ normal:"HTF refers to a larger-picture chart timeframe, such as the daily or 4-hour chart, used to establish overall bias.",
+ simple:"HTF just means a bigger-picture chart, like the daily or 4-hour chart, used to see the overall direction."},
+{id:"ltf",term:"LTF",full:"Lower Time Frame",cat:"Timeframes",
+ normal:"LTF refers to a smaller, zoomed-in chart timeframe, such as the 1-minute or 5-minute chart, used to fine-tune entries.",
+ simple:"LTF just means a zoomed-in chart, like the 1-minute or 5-minute chart, used to fine-tune entries."},
+{id:"mtf",term:"MTF",full:"Multiple Time Frame Analysis",cat:"Timeframes",
+ normal:"MTF Analysis means analyzing more than one chart timeframe together so that the larger and smaller pictures align before taking a trade.",
+ simple:"MTF means looking at more than one chart timeframe together, so the big picture and the small picture agree before taking a trade."},
+
+{id:"bullish-candle",term:"Bullish Candle",cat:"Candlestick Terms",
+ normal:"A bullish candle closes higher than it opened, usually shown in green or white, showing buyers were in control during that period.",
+ simple:"A bullish candle means price went UP during that time period. The close is higher than the open."},
+{id:"bearish-candle",term:"Bearish Candle",cat:"Candlestick Terms",
+ normal:"A bearish candle closes lower than it opened, usually shown in red or black, showing sellers were in control during that period.",
+ simple:"A bearish candle means price went DOWN during that time period. The close is lower than the open."},
+{id:"wick",term:"Wick",cat:"Candlestick Terms",
+ normal:"The wick (or shadow) is the thin line above or below a candle's body, showing the highest and lowest prices reached during that period.",
+ simple:"The wick is the skinny line sticking out of a candle. It shows how far price poked up or down before settling back."},
+{id:"body",term:"Body",cat:"Candlestick Terms",
+ normal:"The body is the thick part of a candle, showing the range between the open and close price.",
+ simple:"The body is the fat part of the candle. It shows where price opened and where it closed."},
+
+{id:"supply-zone",term:"Supply Zone",cat:"Supply & Demand",
+ normal:"A supply zone is an area where selling pressure has previously overwhelmed buying pressure, often causing price to fall sharply from there.",
+ simple:"A supply zone is a spot where sellers showed up in force before and pushed price down. Price sometimes reacts there again."},
+{id:"demand-zone",term:"Demand Zone",cat:"Supply & Demand",
+ normal:"A demand zone is an area where buying pressure has previously overwhelmed selling pressure, often causing price to rise sharply from there.",
+ simple:"A demand zone is a spot where buyers showed up in force before and pushed price up. Price sometimes reacts there again."},
+
+{id:"iofed",term:"IOFED",full:"Institutional Order Flow Entry Drill",cat:"Entry & Trade Terminology",
+ normal:"IOFED is a structured, step-by-step drill for confirming institutional order flow before entering a trade.",
+ simple:"IOFED is just a structured, step-by-step way of double-checking a setup using order-flow ideas before pulling the trigger."},
+{id:"rr",term:"RR",full:"Risk-to-Reward",cat:"Entry & Trade Terminology",
+ normal:"Risk-to-reward compares how much is being risked on a trade to how much stands to be gained, expressed as a ratio such as 1:3.",
+ simple:"RR just compares what you could lose versus what you could win. A 1:3 RR means you could win 3 times what you're risking."},
+{id:"confirmation-entry",term:"Confirmation Entry",cat:"Entry & Trade Terminology",
+ normal:"A confirmation entry waits for additional evidence — such as an MSS or displacement candle — before entering a trade.",
+ simple:"A confirmation entry means waiting for one more clue that you're right before you actually enter the trade."},
+{id:"limit-entry",term:"Limit Order Entry",cat:"Entry & Trade Terminology",
+ normal:"A limit order entry places an order in advance at a specific price, such as inside a fair value gap or order block, and waits for price to reach it.",
+ simple:"A limit order entry means setting your order ahead of time at a price you want, then waiting for the market to reach it."},
+
+{id:"macro",term:"Macro",cat:"Advanced ICT Concepts",level:8,
+ normal:"ICT Macros refer to specific short time windows within the trading day said to produce noticeably sharper price moves. Note: exact times are debated within the ICT community — treat this as a general concept, not a fixed rule.",
+ simple:"A Macro is a short chunk of time during the day when price sometimes makes a sharper, more purposeful move."},
+{id:"quarterly-theory",term:"Quarterly Theory",cat:"Advanced ICT Concepts",level:8,
+ normal:"Quarterly Theory divides time (a year, month, day, even an hour) into four quarters, with each quarter said to play a different role in price delivery. Note: this is one of the more advanced and debated ICT ideas.",
+ simple:"Quarterly Theory is the idea that time itself can be split into four parts, and each part tends to behave a bit differently."},
+{id:"adv-pd-arrays",term:"Advanced PD Arrays",cat:"Advanced ICT Concepts",level:8,
+ normal:"Advanced PD Arrays refers to combining several reference zones — such as an order block overlapping a fair value gap — into one confluence area, considered stronger than any single array alone.",
+ simple:"Sometimes several different zones line up on top of each other. When that happens, ICT traders see it as an extra-strong spot."}
+];
+
+const LEARNING_PATH = [
+{n:1,title:"Absolute Beginner",items:["price","bullish-candle","swing-high","trend","liquidity"]},
+{n:2,title:"Market Structure",items:["hh","hl","lh","ll","bos","mss","displacement"]},
+{n:3,title:"Liquidity",items:["bsl","ssl","eqh","eql","liquidity-sweep","stop-run","inducement","dol"]},
+{n:4,title:"Price Delivery",items:["fvg","ifvg","ob","breaker","mitigation","bpr"]},
+{n:5,title:"Premium / Discount",items:["dealing-range","premium","discount","equilibrium","ote"]},
+{n:6,title:"Time",items:["kill-zone","daily-open","weekly-open","monthly-open","midnight-open"]},
+{n:7,title:"ICT Models",items:["turtle-soup","amd","judas-swing","silver-bullet","smt"]},
+{n:8,title:"Advanced",items:["ipda","macro","quarterly-theory","adv-pd-arrays"]}
+];
+
+/* ===================== CHART SKELETONS (o,h,l,c) ===================== */
+const SKEL_DOWN=[[100,101,98,99],[99,100,97,98],[98,99,95.5,96],[96,97,93,94],[94,98,93.5,97],
+ [97,99,95,96],[96,97,94,95],[95,96,92.5,93],[93,94,90,91.5],[91.5,99,91,98]];
+const SKEL_DOWN_EXT=[...SKEL_DOWN,[98,98.5,92,93],[93,99,92.5,98]];
+const SKEL_UP=[[100,102,99,101],[101,103,100,102],[102,104,101.5,103],[103,106,102,105],[105,105.5,101,102],
+ [102,103,100,101],[101,102,99.5,100],[100,105,99,104],[104,108,103,105.5],[105.5,106,98,99]];
+const SKEL_RANGE=[[97,98,96,97.5],[97.5,99,97,98.5],[98.5,100,98,99],[99,99.5,96,96.5],[96.5,97,95,95.5],
+ [95.5,97,95,96.5],[96.5,97,92,93],[93,98,92.5,97.5],[97.5,103,97,102],[102,106,101,105]];
+const SKEL_FVG=[[96,97,95,96.5],[96.5,99,96,98.5],[98.5,100,98,99.5],[99.5,99.8,97,97.3],[97.3,97.5,94,94.5]];
+const LRLR_C=[[100,101,99,100.5],[100.5,101.5,100,101.2],[101.2,102,100.8,101.6],[101.6,102,101,101.3],
+ [101.3,101.6,100,100.4],[100.4,100.8,99,99.3]];
+const HRLR_C=[[100,101,99,100.5],[100.5,101.5,100,101.2],[101.2,102,100.8,101.6],[101.6,102.4,101,102.1],
+ [102.1,103.2,101.8,102.6],[102.6,102.8,99.5,100]];
+const SMT_A=[[100,101,98,99],[99,100,97,98],[98,99,96,97.5],[97.5,98,94,95],[95,97,94.5,96],[96,97,95,95.5],
+ [95.5,96,91,92],[92,96,91.5,95]];
+const SMT_B=[[100,101,98,99],[99,100,97,98],[98,99,96,97.5],[97.5,98,94,95],[95,97,94.5,96],[96,97,95,95.5],
+ [95.5,96,94.2,95.8],[95.8,99,95.5,98]];
+
+/* ===================== DEMOS ===================== */
+const DEMOS = [
+{id:"liquidity-sweep",title:"Liquidity Sweep",tags:"Liquidity Runs",
+ panels:[{label:"Price chart",candles:SKEL_DOWN}],
+ steps:[
+  {reveal:[4],anns:[{panel:0,type:"hline",price:93,label:"Previous Low"}],caption:"Step 1 — Price creates a previous low. Traders who sold near this low likely placed stop-losses just below it."},
+  {reveal:[7],anns:[{panel:0,type:"hline",price:93,label:"Previous Low"}],caption:"Step 2 — Price approaches the low again. This is where things get interesting."},
+  {reveal:[8],anns:[{panel:0,type:"hline",price:93,label:"Previous Low"},{panel:0,type:"zone",x1:7,x2:8,p1:90,p2:93,label:"Sell-Side Liquidity",tone:"bear"}],caption:"Step 3 — Price moves below the low, running the sell-side liquidity resting there."},
+  {reveal:[9],anns:[{panel:0,type:"hline",price:93,label:"Previous Low"},{panel:0,type:"text",idx:8,price:89.4,label:"Liquidity Sweep"}],caption:"Step 4 — Liquidity is swept: those stop orders below the low get triggered."},
+  {reveal:[9],anns:[{panel:0,type:"hline",price:93,label:"Previous Low"},{panel:0,type:"arrow",fromIdx:8,fromPrice:91,toIdx:9,toPrice:97.5,label:"Displacement / Demand"}],caption:"Step 5 — Price reverses sharply. The sweep may have been exactly what triggered the real move up."}
+ ]},
+{id:"buy-sell-side-liquidity",title:"Buy-Side vs Sell-Side Liquidity",tags:"Liquidity · BSL · SSL",
+ panels:[{label:"Buy-side liquidity (above highs)",candles:SKEL_UP},{label:"Sell-side liquidity (below lows)",candles:SKEL_DOWN}],
+ steps:[
+  {reveal:[4,4],anns:[{panel:0,type:"hline",price:106,label:"Swing High"},{panel:1,type:"hline",price:93,label:"Swing Low"}],caption:"Both charts form a clear swing point — a high on the left, a low on the right."},
+  {reveal:[9,9],anns:[{panel:0,type:"zone",x1:2,x2:4,p1:106,p2:108,label:"BSL — resting above the high",tone:"bear"},{panel:1,type:"zone",x1:2,x2:4,p1:90,p2:93,label:"SSL — resting below the low",tone:"bull"}],caption:"Buy-side liquidity (left) sits above highs; sell-side liquidity (right) sits below lows. Price is often 'drawn' toward whichever pool is closest."}
+ ]},
+{id:"equal-highs-lows",title:"Equal Highs & Equal Lows",tags:"Highs & Lows · EQH · EQL",
+ panels:[{label:"Equal Highs",candles:SKEL_UP},{label:"Equal Lows",candles:SKEL_DOWN}],
+ steps:[
+  {reveal:[8,8],anns:[{panel:0,type:"hline",price:106,label:"High #1"},{panel:1,type:"hline",price:93,label:"Low #1"}],caption:"A first high (left) and first low (right) form."},
+  {reveal:[9,9],anns:[{panel:0,type:"hline",price:106,label:"Equal Highs"},{panel:0,type:"text",idx:7,price:104,label:"~same level"},{panel:1,type:"hline",price:93,label:"Equal Lows"},{panel:1,type:"text",idx:7,price:91,label:"~same level"}],caption:"A second high/low forms near the same price. Because so many traders' stops sit right at these levels, equal highs/lows are magnets for a liquidity run."}
+ ]},
+{id:"lrlr-vs-hrlr",title:"LRLR vs HRLR",tags:"Liquidity Runs",
+ panels:[{label:"LRLR — Low Resistance",candles:LRLR_C},{label:"HRLR — High Resistance",candles:HRLR_C}],
+ steps:[
+  {reveal:[3,3],anns:[{panel:0,type:"hline",price:102.5,label:"Resting liquidity"},{panel:1,type:"hline",price:102.5,label:"Resting liquidity"}],caption:"Both charts approach the same kind of level — a spot with resting orders above."},
+  {reveal:[5,5],anns:[{panel:0,type:"hline",price:102.5,label:"Never reached"},{panel:1,type:"hline",price:102.5,label:"Swept"},{panel:1,type:"zone",x1:3,x2:4,p1:102.5,p2:103.3,label:"Sweep",tone:"bear"}],caption:"LRLR (left): price turns away before ever tagging the level — a low-resistance path, gliding away smoothly. HRLR (right): price pushes through and sweeps the level before reacting sharply."},
+  {reveal:[5,5],anns:[{panel:0,type:"text",idx:4,price:99.8,label:"Smooth move, little reaction"},{panel:1,type:"arrow",fromIdx:4,fromPrice:102.6,toIdx:5,toPrice:100.2,label:"Sharp reversal"}],caption:"What happened? LRLR ran with little resistance in its path. HRLR met a wall of orders — once that liquidity was taken, price reacted hard. Why it matters: HRLR reactions tend to be the more reliable, tradeable reversals, since real orders were actually absorbed there. Note: exact definitions can vary slightly by ICT source — this is the general idea."}
+ ]},
+{id:"market-structure-bos-mss",title:"Market Structure: BOS & MSS",tags:"Market Structure · Displacement",
+ panels:[{label:"Price chart",candles:SKEL_DOWN}],
+ steps:[
+  {reveal:[4],anns:[{panel:0,type:"text",idx:1,price:99.5,label:"LH"},{panel:0,type:"text",idx:3,price:92.5,label:"LL"}],caption:"Price is making lower highs and lower lows — a downtrend."},
+  {reveal:[7],anns:[{panel:0,type:"hline",price:98,label:"Structure high"}],caption:"Price pulls back toward the last lower high without breaking above it — structure is still bearish."},
+  {reveal:[9],anns:[{panel:0,type:"hline",price:98,label:"Structure high"},{panel:0,type:"text",idx:9,price:98.8,label:"BOS / MSS"}],caption:"Price breaks back above that structure high with a big displacement candle. Because this breaks against the prior downtrend, it's read as an MSS (a possible shift). If it had broken a high in the direction of an existing uptrend instead, it would simply be labeled a BOS (trend continuation)."}
+ ]},
+{id:"inducement-dol-irl-erl",title:"Inducement, DOL, IRL & ERL",tags:"Liquidity Runs · Advanced",
+ panels:[{label:"Price chart",candles:SKEL_RANGE}],
+ steps:[
+  {reveal:[5],anns:[{panel:0,type:"hline",price:99.5,label:"Range high (ERL)"},{panel:0,type:"hline",price:95.5,label:"Range low (ERL)"},{panel:0,type:"zone",x1:1,x2:4,p1:95.5,p2:99.5,label:"IRL inside the range",tone:"neutral"}],caption:"A range forms. The obvious high/low are External Range Liquidity (ERL); the small highs/lows and gaps between them are Internal Range Liquidity (IRL)."},
+  {reveal:[6],anns:[{panel:0,type:"text",idx:4,price:94.6,label:"Inducement"}],caption:"A small dip just below the range low lures in early sellers — this minor low is Inducement, not the real target."},
+  {reveal:[9],anns:[{panel:0,type:"text",idx:6,price:91.4,label:"Real DOL swept"},{panel:0,type:"arrow",fromIdx:6,fromPrice:92.5,toIdx:9,toPrice:104,label:"Distribution"}],caption:"Price then reaches further down to the real Draw on Liquidity (DOL) before reversing hard and distributing higher — the true liquidity target was lower than the inducement low."}
+ ]},
+{id:"fair-value-gap",title:"Fair Value Gap (FVG)",tags:"Fair Value Gaps & Imbalances",
+ panels:[{label:"Price chart",candles:SKEL_FVG}],
+ steps:[
+  {reveal:[3],anns:[{panel:0,type:"zone",x1:0,x2:2,p1:97,p2:98,label:"FVG (gap left behind)",tone:"bull"}],caption:"A fast, strong candle skips over the 97–98 area entirely — candle 1's high doesn't overlap candle 3's low, leaving a gap: the Fair Value Gap."},
+  {reveal:[5],anns:[{panel:0,type:"zone",x1:0,x2:2,p1:97,p2:98,label:"FVG",tone:"bull"},{panel:0,type:"text",idx:4,price:96.6,label:"Price returns to fill it"}],caption:"Price later pulls back into that gap ('filling' it) before continuing — a common way traders look to enter in the direction of the original move."}
+ ]},
+{id:"inverse-fvg",title:"Inverse Fair Value Gap (IFVG)",tags:"Fair Value Gaps & Imbalances",
+ panels:[{label:"Price chart",candles:SKEL_FVG}],
+ steps:[
+  {reveal:[3],anns:[{panel:0,type:"zone",x1:0,x2:2,p1:97,p2:98,label:"Bullish FVG",tone:"bull"}],caption:"A bullish FVG forms between 97 and 98, first acting as support."},
+  {reveal:[5],anns:[{panel:0,type:"zone",x1:0,x2:2,p1:97,p2:98,label:"Now acting as resistance",tone:"bear"},{panel:0,type:"text",idx:4,price:93.9,label:"Broken through"}],caption:"Price later closes fully back through the gap. Once that happens, the same 97–98 zone can flip and start acting as resistance instead — that's an Inverse FVG."}
+ ]},
+{id:"order-block",title:"Order Block",tags:"Order Blocks",
+ panels:[{label:"Price chart",candles:SKEL_DOWN}],
+ steps:[
+  {reveal:[8],anns:[{panel:0,type:"zone",x1:7,x2:7,p1:92.5,p2:95,label:"Bullish Order Block",tone:"bull"}],caption:"Candle 8 is the last down candle before the big up move — that candle's range is marked as the Bullish Order Block."},
+  {reveal:[9],anns:[{panel:0,type:"zone",x1:7,x2:7,p1:92.5,p2:95,label:"Bullish Order Block",tone:"bull"},{panel:0,type:"arrow",fromIdx:8,fromPrice:91.5,toIdx:9,toPrice:98,label:"Displacement away from it"}],caption:"Immediately after, price displaces sharply higher. If price returns to that order block zone later, ICT traders often watch it as a possible support area."}
+ ]},
+{id:"breaker-mitigation-bpr",title:"Breaker, Mitigation & BPR",tags:"Order Blocks · Fair Value Gaps & Imbalances",
+ panels:[{label:"Price chart",candles:SKEL_DOWN_EXT}],
+ steps:[
+  {reveal:[9],anns:[{panel:0,type:"zone",x1:7,x2:7,p1:92.5,p2:95,label:"Bullish Order Block",tone:"bull"}],caption:"An order block forms (candle 8) right before displacement higher."},
+  {reveal:[10],anns:[{panel:0,type:"zone",x1:7,x2:7,p1:92.5,p2:95,label:"Order block fails",tone:"bear"},{panel:0,type:"text",idx:10,price:91.6,label:"Breaker forms"}],caption:"Later, price drops back through that order block and closes below it — the order block has failed, so it becomes a Breaker Block, now expected to act as resistance instead of support."},
+  {reveal:[11],anns:[{panel:0,type:"zone",x1:7,x2:7,p1:92.5,p2:95,label:"Mitigation / Breaker zone",tone:"neutral"},{panel:0,type:"arrow",fromIdx:10,fromPrice:92.2,toIdx:11,toPrice:98,label:"Reaction from the zone"}],caption:"When price returns to that same zone again, it's also being Mitigated — traders caught on the wrong side there get a chance to exit. A Balanced Price Range (BPR) is this same idea taken further: a spot where a bullish gap and a bearish gap actually overlap, making the zone extra significant."}
+ ]},
+{id:"premium-discount-equilibrium",title:"Premium, Discount & Equilibrium",tags:"Premium & Discount",
+ panels:[{label:"Price chart",candles:SKEL_RANGE}],
+ steps:[
+  {reveal:[5],anns:[{panel:0,type:"hline",price:99.5,label:"Range high"},{panel:0,type:"hline",price:95.5,label:"Range low"}],caption:"First, mark the range: a recent high and a recent low."},
+  {reveal:[5],anns:[{panel:0,type:"hline",price:97.5,label:"Equilibrium (50%)"},{panel:0,type:"zone",x1:0,x2:5,p1:97.5,p2:99.5,label:"Premium",tone:"bear"},{panel:0,type:"zone",x1:0,x2:5,p1:95.5,p2:97.5,label:"Discount",tone:"bull"}],caption:"Equilibrium splits the range exactly in half. The top half is Premium (relatively expensive); the bottom half is Discount (relatively cheap)."}
+ ]},
+{id:"ote",title:"Optimal Trade Entry (OTE)",tags:"OTE",
+ panels:[{label:"Price chart",candles:SKEL_RANGE}],
+ steps:[
+  {reveal:[8],anns:[{panel:0,type:"zone",x1:4,x2:6,p1:92,p2:94,label:"OTE zone (~62–79%)",tone:"bull"}],caption:"After the swing down, that deep pullback zone — roughly 62–79% of the move — is the Optimal Trade Entry. It's where many ICT traders look for an entry before the larger move continues."}
+ ]},
+{id:"dealing-range",title:"Dealing Range",tags:"Dealing Ranges",
+ panels:[{label:"Price chart",candles:SKEL_RANGE}],
+ steps:[
+  {reveal:[5],anns:[{panel:0,type:"hline",price:99.5,label:"Dealing Range high"},{panel:0,type:"hline",price:95.5,label:"Dealing Range low"},{panel:0,type:"zone",x1:0,x2:5,p1:95.5,p2:99.5,label:"Dealing Range",tone:"neutral"}],caption:"The dealing range is simply the box between a recent swing high and swing low — the frame everything else (premium, discount, equilibrium, OTE) is measured against."}
+ ]},
+{id:"amd-po3-judas",title:"AMD / Power of Three & Judas Swing",tags:"ICT Trading Models",
+ panels:[{label:"Price chart",candles:SKEL_RANGE}],
+ steps:[
+  {reveal:[5],anns:[{panel:0,type:"zone",x1:0,x2:5,p1:95.5,p2:99.5,label:"Accumulation",tone:"neutral"}],caption:"Accumulation — price sits quietly inside a range while orders build up."},
+  {reveal:[6],anns:[{panel:0,type:"zone",x1:0,x2:5,p1:95.5,p2:99.5,label:"Accumulation",tone:"neutral"},{panel:0,type:"text",idx:6,price:91.4,label:"Manipulation / Judas Swing"}],caption:"Manipulation — price fakes a move outside the range (a Judas Swing) to trap traders leaning the wrong way."},
+  {reveal:[9],anns:[{panel:0,type:"zone",x1:0,x2:5,p1:95.5,p2:99.5,label:"Accumulation",tone:"neutral"},{panel:0,type:"arrow",fromIdx:6,fromPrice:92.5,toIdx:9,toPrice:104,label:"Distribution"}],caption:"Distribution — the real move happens, in the true intended direction. Together these three phases are AMD, also called the Power of Three (PO3)."}
+ ]},
+{id:"turtle-soup-stop-run",title:"Turtle Soup & Stop Runs",tags:"Liquidity Runs",
+ panels:[{label:"Price chart",candles:SKEL_DOWN}],
+ steps:[
+  {reveal:[7],anns:[{panel:0,type:"hline",price:93,label:"Prior low"}],caption:"A prior low sits at 93 — breakout traders are watching it closely."},
+  {reveal:[8],anns:[{panel:0,type:"hline",price:93,label:"Prior low"},{panel:0,type:"text",idx:8,price:89.4,label:"Stop Run"}],caption:"Price breaks below it — a stop run — triggering the stop-loss orders of traders who bought above."},
+  {reveal:[9],anns:[{panel:0,type:"hline",price:93,label:"Prior low"},{panel:0,type:"arrow",fromIdx:8,fromPrice:91,toIdx:9,toPrice:97.5,label:"Turtle Soup reversal"}],caption:"Instead of continuing down, price snaps back above the low — this trap-and-reverse pattern is what ICT calls Turtle Soup."}
+ ]},
+{id:"kill-zones",title:"Kill Zones & Sessions",tags:"Time & Sessions",custom:"timeline"},
+{id:"smt-divergence",title:"SMT Divergence",tags:"SMT & Correlation",
+ panels:[{label:"Instrument A — makes a new low",candles:SMT_A},{label:"Instrument B — fails to make a new low",candles:SMT_B}],
+ steps:[
+  {reveal:[6,6],anns:[{panel:0,type:"hline",price:94,label:"Prior low"},{panel:1,type:"hline",price:94,label:"Prior low"}],caption:"Two correlated markets both form a similar prior low."},
+  {reveal:[8,8],anns:[{panel:0,type:"text",idx:6,price:90.4,label:"New lower low"},{panel:1,type:"hline",price:94,label:"Holds above — no new low"}],caption:"Instrument A pushes to a new, lower low. Instrument B fails to follow — it holds above its prior low. This mismatch is SMT Divergence, and it's often read as an early hint that a reversal may be forming."}
+ ]}
+];
+
+/* ============================= STATE ============================= */
+const LS_KNOWN="ictacademy_known", LS_REVIEW="ictacademy_review", LS_QUIZ="ictacademy_quiz", LS_THEME="ictacademy_theme";
+function loadSet(key){try{return new Set(JSON.parse(localStorage.getItem(key)||"[]"));}catch(e){return new Set();}}
+function saveSet(key,set){localStorage.setItem(key,JSON.stringify([...set]));}
+let known = loadSet(LS_KNOWN);
+let review = loadSet(LS_REVIEW);
+let quizStats = JSON.parse(localStorage.getItem(LS_QUIZ) || '{"attempts":0,"correct":0}');
+function saveQuizStats(){localStorage.setItem(LS_QUIZ, JSON.stringify(quizStats));}
+
+const termById = Object.fromEntries(TERMS.map(t=>[t.id,t]));
+const demoById = Object.fromEntries(DEMOS.map(d=>{d.panels&&d.panels.forEach((p,i)=>p.index=i); return [d.id,d];}));
+
+/* ============================= NAV ============================= */
+function goto(screen){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-"+screen).classList.add("active");
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("active", b.dataset.screen===screen));
+  window.scrollTo({top:0,behavior:"instant"});
+  if(screen==="progress") renderProgress();
+}
+document.getElementById("tabs").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-screen]"); if(!b) return; goto(b.dataset.screen);
+});
+document.querySelectorAll("[data-goto]").forEach(el=>el.addEventListener("click",()=>goto(el.dataset.goto)));
+
+/* ============================= THEME ============================= */
+const savedTheme = localStorage.getItem(LS_THEME) || "dark";
+document.body.setAttribute("data-theme",savedTheme);
+document.getElementById("themeToggle").textContent = savedTheme==="dark"?"🌙":"☀️";
+document.getElementById("themeToggle").addEventListener("click",()=>{
+  const cur = document.body.getAttribute("data-theme");
+  const next = cur==="dark"?"light":"dark";
+  document.body.setAttribute("data-theme",next);
+  localStorage.setItem(LS_THEME,next);
+  document.getElementById("themeToggle").textContent = next==="dark"?"🌙":"☀️";
+});
+
+/* ============================= HOME: LEARNING PATH ============================= */
+function renderLearningPath(){
+  const el = document.getElementById("learningPath");
+  el.innerHTML = LEARNING_PATH.map(lvl=>`
+    <div class="path-level">
+      <div class="path-num mono">L${lvl.n}</div>
+      <div>
+        <p class="path-title">${lvl.title}</p>
+        <div class="path-items">
+          ${lvl.items.map(id=>{const t=termById[id]; return t?`<span class="chip link" data-term="${id}">${t.term}</span>`:"";}).join("")}
+        </div>
+      </div>
+    </div>`).join("");
+  el.querySelectorAll(".chip.link").forEach(c=>c.addEventListener("click",()=>{
+    const t = termById[c.dataset.term];
+    goto("flashcards");
+    openCategory(t.cat, t.id);
+  }));
+}
+
+/* ============================= FLASHCARDS ============================= */
+let fc = {category:null, list:[], index:0, flipped:false, simpleMode:false};
+
+function categoryCounts(){
+  const map={}; CATEGORIES.forEach(c=>map[c]=0);
+  TERMS.forEach(t=>map[t.cat]++);
+  return map;
+}
+function categoryKnownCount(cat){
+  return TERMS.filter(t=>t.cat===cat && known.has(t.id)).length;
+}
+function renderCategoryPicker(){
+  const counts = categoryCounts();
+  const el = document.getElementById("fcCategoryPicker");
+  el.innerHTML = CATEGORIES.map(c=>{
+    const total=counts[c]||0; if(total===0) return "";
+    const k = categoryKnownCount(c);
+    const pct = total? Math.round(k/total*100):0;
+    return `<button class="cat-card" data-cat="${c}">
+      <div class="cname">${c}</div>
+      <div class="ccount">${total} term${total!==1?"s":""} · ${k} known</div>
+      <div class="cbar"><div style="width:${pct}%"></div></div>
+    </button>`;
+  }).join("");
+  el.querySelectorAll(".cat-card").forEach(b=>b.addEventListener("click",()=>openCategory(b.dataset.cat)));
+
+  const sel = document.getElementById("fcCategory");
+  sel.innerHTML = `<option value="">All categories (${TERMS.length} terms)</option>` +
+    CATEGORIES.filter(c=>counts[c]>0).map(c=>`<option value="${c}">${c} (${counts[c]})</option>`).join("");
+}
+document.getElementById("fcCategory").addEventListener("change",e=>{
+  if(e.target.value) openCategory(e.target.value); else openCategory(null);
+});
+
+function openCategory(cat, focusId){
+  fc.category = cat;
+  fc.list = (cat ? TERMS.filter(t=>t.cat===cat) : TERMS.slice());
+  fc.index = focusId ? Math.max(0, fc.list.findIndex(t=>t.id===focusId)) : 0;
+  fc.flipped = false;
+  document.getElementById("fcCategory").value = cat || "";
+  document.getElementById("fcCategoryPicker").style.display="none";
+  document.getElementById("fcStudyArea").style.display="block";
+  renderCard();
+}
+document.getElementById("fcBackToCats").addEventListener("click",()=>{
+  document.getElementById("fcCategoryPicker").style.display="grid";
+  document.getElementById("fcStudyArea").style.display="none";
+  document.getElementById("fcCategory").value="";
+  renderCategoryPicker();
+});
+
+function renderCard(){
+  const card = document.getElementById("flashcard");
+  card.classList.toggle("flipped", fc.flipped);
+  if(!fc.list.length){
+    document.getElementById("cardTermFront").textContent="No terms found";
+    document.getElementById("fcProgressText").textContent="0 / 0";
+    return;
+  }
+  const t = fc.list[fc.index];
+  document.getElementById("cardCatFront").textContent = t.cat;
+  document.getElementById("cardTermFront").textContent = t.term;
+  document.getElementById("cardFullFront").textContent = t.full || "";
+  document.getElementById("cardCatBack").textContent = t.cat;
+  document.getElementById("cardDefBack").textContent = fc.simpleMode ? "" : t.normal;
+  document.querySelector(".fc-mode-label").textContent = fc.simpleMode ? "Super simple explanation" : "Normal explanation";
+  document.getElementById("cardDefBack").style.display = fc.simpleMode ? "none" : "block";
+  document.getElementById("cardSimpleBack").textContent = t.simple;
+  document.querySelector(".fc-simple").style.display = "block";
+  const demoBtn = document.getElementById("cardDemoLink");
+  if(t.demo){ demoBtn.style.display="inline-flex"; demoBtn.onclick=(e)=>{e.stopPropagation(); goto("visual"); openDemo(t.demo);}; }
+  else demoBtn.style.display="none";
+  document.getElementById("fcProgressText").textContent = `${fc.index+1} / ${fc.list.length}`;
+}
+document.getElementById("fcSimpleToggle").addEventListener("change",e=>{fc.simpleMode=e.target.checked; renderCard();});
+document.getElementById("flashcard").addEventListener("click",()=>{fc.flipped=!fc.flipped; renderCard();});
+document.getElementById("fcFlip").addEventListener("click",()=>{fc.flipped=!fc.flipped; renderCard();});
+document.getElementById("fcNext").addEventListener("click",()=>{if(!fc.list.length)return; fc.index=(fc.index+1)%fc.list.length; fc.flipped=false; renderCard();});
+document.getElementById("fcPrev").addEventListener("click",()=>{if(!fc.list.length)return; fc.index=(fc.index-1+fc.list.length)%fc.list.length; fc.flipped=false; renderCard();});
+document.getElementById("fcShuffle").addEventListener("click",()=>{
+  for(let i=fc.list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [fc.list[i],fc.list[j]]=[fc.list[j],fc.list[i]];}
+  fc.index=0; fc.flipped=false; renderCard();
+});
+document.getElementById("fcRestart").addEventListener("click",()=>{fc.index=0; fc.flipped=false; renderCard();});
+document.getElementById("fcIKnow").addEventListener("click",()=>{
+  if(!fc.list.length)return; const t=fc.list[fc.index];
+  known.add(t.id); review.delete(t.id); saveSet(LS_KNOWN,known); saveSet(LS_REVIEW,review);
+  document.getElementById("fcNext").click();
+});
+document.getElementById("fcReviewAgain").addEventListener("click",()=>{
+  if(!fc.list.length)return; const t=fc.list[fc.index];
+  review.add(t.id); known.delete(t.id); saveSet(LS_KNOWN,known); saveSet(LS_REVIEW,review);
+  document.getElementById("fcNext").click();
+});
+document.getElementById("fcSearch").addEventListener("input",e=>{
+  const q=e.target.value.trim().toLowerCase();
+  if(!q){ document.getElementById("fcCategoryPicker").style.display="grid"; document.getElementById("fcStudyArea").style.display="none"; return; }
+  fc.category=null;
+  fc.list = TERMS.filter(t => t.term.toLowerCase().includes(q) || (t.full||"").toLowerCase().includes(q) || t.normal.toLowerCase().includes(q) || t.simple.toLowerCase().includes(q));
+  fc.index=0; fc.flipped=false;
+  document.getElementById("fcCategoryPicker").style.display="none";
+  document.getElementById("fcStudyArea").style.display="block";
+  document.getElementById("fcCategory").value="";
+  renderCard();
+});
+
+/* ============================= GLOSSARY ============================= */
+function renderGlossary(filterCat, q){
+  const list = TERMS.filter(t=>{
+    if(filterCat && t.cat!==filterCat) return false;
+    if(q){ const s=q.toLowerCase(); return t.term.toLowerCase().includes(s)||(t.full||"").toLowerCase().includes(s)||t.normal.toLowerCase().includes(s)||t.simple.toLowerCase().includes(s); }
+    return true;
+  }).sort((a,b)=>a.term.localeCompare(b.term));
+  const el = document.getElementById("glossaryList");
+  el.innerHTML = list.length ? list.map(t=>`
+    <details class="gterm">
+      <summary><span class="gt mono">${t.term}</span>${t.full?`<span style="color:var(--ink-faint); font-weight:400;">${t.full}</span>`:""}<span class="gc">${t.cat}</span></summary>
+      <div class="gbody">
+        <p style="margin:0 0 6px;">${t.normal}</p>
+        <div class="simple"><b style="color:var(--accent);">Super simple:</b> ${t.simple}</div>
+      </div>
+    </details>`).join("") : `<div class="empty">No terms match your search.</div>`;
+}
+function initGlossaryCatSelect(){
+  const sel=document.getElementById("glCategory");
+  const counts=categoryCounts();
+  sel.innerHTML = `<option value="">All categories</option>` + CATEGORIES.filter(c=>counts[c]>0).map(c=>`<option value="${c}">${c}</option>`).join("");
+}
+document.getElementById("glSearch").addEventListener("input",()=>renderGlossary(document.getElementById("glCategory").value, document.getElementById("glSearch").value));
+document.getElementById("glCategory").addEventListener("change",()=>renderGlossary(document.getElementById("glCategory").value, document.getElementById("glSearch").value));
+
+/* ============================= VISUAL LESSONS / CHART ENGINE ============================= */
+function renderPanelSVG(panel, revealCount, anns, showLabels){
+  const candles = panel.candles;
+  const highs = candles.map(c=>c[1]), lows = candles.map(c=>c[2]);
+  const annPrices=[]; anns.filter(a=>a.panel===panel.index).forEach(a=>{
+    if(a.price!==undefined) annPrices.push(a.price);
+    if(a.p1!==undefined) annPrices.push(a.p1); if(a.p2!==undefined) annPrices.push(a.p2);
+    if(a.fromPrice!==undefined) annPrices.push(a.fromPrice); if(a.toPrice!==undefined) annPrices.push(a.toPrice);
+  });
+  const allHigh = Math.max(...highs, ...annPrices), allLow = Math.min(...lows, ...annPrices);
+  const pad = (allHigh-allLow)*0.12 || 1;
+  const min=allLow-pad, max=allHigh+pad;
+  const W=520,H=260,padL=10,padR=10,padT=14,padB=14;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const n=candles.length, xStep=plotW/n, bodyW=Math.max(6,xStep*0.46);
+  const X = i => padL + i*xStep + xStep/2;
+  const Y = p => padT + (max-p)/(max-min)*plotH;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" class="ict-chart" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="arrow-${panel.index}-${Math.random().toString(36).slice(2,7)}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--ink)"/></marker></defs>`;
+  const markerId = `arrow-${panel.index}`;
+  svg = svg.replace(/arrow-\d+-\w+/, markerId);
+  for(let i=0;i<Math.min(revealCount,n);i++){
+    const [o,h,l,c]=candles[i]; const up=c>=o; const color= up?"var(--bull)":"var(--bear)"; const x=X(i);
+    svg+=`<line x1="${x}" y1="${Y(h)}" x2="${x}" y2="${Y(l)}" stroke="${color}" stroke-width="1.5"/>`;
+    const yTop=Y(Math.max(o,c)), yBot=Y(Math.min(o,c)); const hgt=Math.max(2,yBot-yTop);
+    svg+=`<rect x="${x-bodyW/2}" y="${yTop}" width="${bodyW}" height="${hgt}" fill="${color}" rx="1.5"/>`;
+  }
+  anns.filter(a=>a.panel===panel.index).forEach(a=>{
+    if(a.type==="hline"){
+      const y=Y(a.price);
+      svg+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--line)" stroke-width="1.1" stroke-dasharray="4 3"/>`;
+      if(showLabels && a.label) svg+=`<text x="${padL+2}" y="${y-4}" class="chart-label">${a.label}</text>`;
+    } else if(a.type==="zone"){
+      const x1=X(a.x1)-bodyW*0.9, x2=X(a.x2)+bodyW*0.9;
+      const top=Math.min(Y(a.p1),Y(a.p2)), bot=Math.max(Y(a.p1),Y(a.p2));
+      const fillVar = a.tone==="bull"?"var(--bull-zone)":a.tone==="bear"?"var(--bear-zone)":"var(--zone)";
+      svg+=`<rect x="${x1}" y="${top}" width="${x2-x1}" height="${Math.max(2,bot-top)}" fill="${fillVar}"/>`;
+      if(showLabels && a.label) svg+=`<text x="${x1+3}" y="${top+11}" class="chart-label">${a.label}</text>`;
+    } else if(a.type==="arrow"){
+      svg+=`<line x1="${X(a.fromIdx)}" y1="${Y(a.fromPrice)}" x2="${X(a.toIdx)}" y2="${Y(a.toPrice)}" stroke="var(--ink)" stroke-width="1.6" marker-end="url(#${markerId})"/>`;
+      if(showLabels && a.label) svg+=`<text x="${Math.min(W-90,X(a.toIdx)+4)}" y="${Y(a.toPrice)-4}" class="chart-label">${a.label}</text>`;
+    } else if(a.type==="text"){
+      if(showLabels) svg+=`<text x="${X(a.idx)}" y="${Y(a.price)}" class="chart-label" text-anchor="middle">${a.label}</text>`;
+    }
+  });
+  svg+="</svg>";
+  return svg;
+}
+
+function renderTimelineWidget(showLabels){
+  return `<div class="panel-wrap">
+    <div class="panel-label">Trading day (New York time, approximate ICT session windows)</div>
+    <div class="timeline">
+      <div class="ticks">${Array.from({length:24}).map(()=>`<div></div>`).join("")}</div>
+      <div class="seg" style="left:${2/24*100}%; width:${3/24*100}%; background:var(--accent2); opacity:.55;">${showLabels?`<div class="seg-label" style="color:var(--accent2);">London KZ 2–5am</div>`:""}</div>
+      <div class="seg" style="left:${7/24*100}%; width:${3/24*100}%; background:var(--accent); opacity:.55;">${showLabels?`<div class="seg-label" style="color:var(--accent);">NY KZ 7–10am</div>`:""}</div>
+      <div class="seg" style="left:${0/24*100}%; width:2px; background:var(--ink-faint);"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace;">
+      <span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>12am</span>
+    </div>
+  </div>
+  <p class="footnote">Kill zone times are the commonly-cited approximate windows and can vary by source or by daylight saving changes — always double check current session times rather than trusting a fixed clock.</p>`;
+}
+
+let dp = {demoId:null, stepIndex:0, playing:false, timer:null, speed:2200, showLabels:true};
+
+function renderDemoGrid(){
+  const el=document.getElementById("demoGrid");
+  el.innerHTML = DEMOS.map(d=>`<button class="demo-card" data-demo="${d.id}">
+      <div class="dtitle">${d.title}</div><div class="dtags">${d.tags}</div>
+    </button>`).join("");
+  el.querySelectorAll(".demo-card").forEach(b=>b.addEventListener("click",()=>openDemo(b.dataset.demo)));
+}
+function openDemo(id){
+  dp.demoId=id; dp.stepIndex=0; dp.playing=false; clearInterval(dp.timer);
+  document.getElementById("demoViewer").style.display="block";
+  renderDemoStep();
+  document.getElementById("demoViewer").scrollIntoView({behavior:"smooth", block:"start"});
+}
+function renderDemoStep(){
+  const demo = demoById[dp.demoId];
+  const viewer = document.getElementById("demoViewer");
+  if(demo.custom==="timeline"){
+    viewer.innerHTML = `
+      <div class="demo-header"><button class="btn small" id="demoClose">← All lessons</button><h3>${demo.title}</h3></div>
+      ${renderTimelineWidget(dp.showLabels)}
+      <div class="row" style="margin-top:14px;">
+        <button class="btn small" id="labelsToggle">${dp.showLabels?"Hide labels":"Show labels"}</button>
+      </div>`;
+    document.getElementById("demoClose").addEventListener("click",closeDemo);
+    document.getElementById("labelsToggle").addEventListener("click",()=>{dp.showLabels=!dp.showLabels; renderDemoStep();});
+    return;
+  }
+  const step = demo.steps[dp.stepIndex];
+  const panelsClass = demo.panels.length===2 ? "p2" : "p1";
+  viewer.innerHTML = `
+    <div class="demo-header"><button class="btn small" id="demoClose">← All lessons</button><h3>${demo.title}</h3></div>
+    <div class="panels ${panelsClass}">
+      ${demo.panels.map(p=>`<div class="panel-wrap"><div class="panel-label">${p.label}</div>${renderPanelSVG(p, step.reveal[p.index], step.anns, dp.showLabels)}</div>`).join("")}
+    </div>
+    <div class="caption">${step.caption}</div>
+    <div class="demo-controls">
+      <button class="btn icon-btn" id="stepRestart" title="Restart">↺</button>
+      <button class="btn icon-btn" id="stepPrev" title="Previous step">◀</button>
+      <button class="btn primary" id="stepPlay">${dp.playing? "⏸ Pause":"▶ Play"}</button>
+      <button class="btn icon-btn" id="stepNext" title="Next step">▶</button>
+      <button class="btn small" id="stepShowMe">Show me — Next Step</button>
+      <select class="speed-select" id="speedSelect">
+        <option value="3200">Slow</option><option value="2200" selected>Normal</option><option value="1200">Fast</option>
+      </select>
+      <button class="btn small" id="labelsToggle">${dp.showLabels?"Hide labels":"Show labels"}</button>
+      <span class="step-dots">${demo.steps.map((s,i)=>`<span class="${i===dp.stepIndex?"on":""}"></span>`).join("")}</span>
+      <span class="mono" style="color:var(--ink-faint); font-size:12px;">Step ${dp.stepIndex+1} / ${demo.steps.length}</span>
+    </div>`;
+  document.getElementById("demoClose").addEventListener("click",closeDemo);
+  document.getElementById("stepRestart").addEventListener("click",()=>{dp.stepIndex=0; stopPlay(); renderDemoStep();});
+  document.getElementById("stepPrev").addEventListener("click",()=>{dp.stepIndex=Math.max(0,dp.stepIndex-1); stopPlay(); renderDemoStep();});
+  document.getElementById("stepNext").addEventListener("click",()=>{stepForward(); stopPlay();});
+  document.getElementById("stepShowMe").addEventListener("click",()=>{stepForward(); stopPlay();});
+  document.getElementById("stepPlay").addEventListener("click",togglePlay);
+  document.getElementById("labelsToggle").addEventListener("click",()=>{dp.showLabels=!dp.showLabels; renderDemoStep();});
+  document.getElementById("speedSelect").value=dp.speed;
+  document.getElementById("speedSelect").addEventListener("change",e=>{dp.speed=parseInt(e.target.value); if(dp.playing){stopPlay(); togglePlay();}});
+}
+function stepForward(){
+  const demo = demoById[dp.demoId];
+  if(dp.stepIndex < demo.steps.length-1){ dp.stepIndex++; renderDemoStep(); }
+  else stopPlay();
+}
+function togglePlay(){
+  const demo = demoById[dp.demoId];
+  if(dp.playing){ stopPlay(); return; }
+  if(dp.stepIndex>=demo.steps.length-1) dp.stepIndex=0;
+  dp.playing=true;
+  dp.timer=setInterval(()=>{
+    const demo=demoById[dp.demoId];
+    if(dp.stepIndex>=demo.steps.length-1){ stopPlay(); renderDemoStep(); return; }
+    dp.stepIndex++; renderDemoStep();
+  }, dp.speed);
+  renderDemoStep();
+}
+function stopPlay(){ dp.playing=false; clearInterval(dp.timer); dp.timer=null; }
+function closeDemo(){ stopPlay(); document.getElementById("demoViewer").style.display="none"; document.getElementById("demoViewer").scrollIntoView({behavior:"smooth"}); }
+
+/* ============================= QUIZ ============================= */
+let quiz = {questions:[], index:0, correctCount:0, answered:false};
+
+function buildQuizQuestions(n){
+  const pool = TERMS.slice();
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]];}
+  const chosen = pool.slice(0, Math.min(n,pool.length));
+  return chosen.map(t=>{
+    const askFull = !!t.full && Math.random()<0.5;
+    const question = askFull ? `What does ${t.term} stand for?` : `What best describes "${t.term}"${t.full?` (${t.full})`:""}?`;
+    const correct = askFull ? t.full : t.normal;
+    let distractorsPool = TERMS.filter(o=>o.id!==t.id && (askFull? !!o.full : true));
+    if(distractorsPool.length<3) distractorsPool = TERMS.filter(o=>o.id!==t.id);
+    for(let i=distractorsPool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [distractorsPool[i],distractorsPool[j]]=[distractorsPool[j],distractorsPool[i]];}
+    const distractors = distractorsPool.slice(0,3).map(o=> askFull ? o.full : o.normal);
+    const choices = [correct, ...distractors];
+    for(let i=choices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [choices[i],choices[j]]=[choices[j],choices[i]];}
+    return {term:t, question, correct, choices, explain: t.normal + "  Super simple: " + t.simple};
+  });
+}
+function startQuiz(n){
+  quiz.questions = buildQuizQuestions(n);
+  quiz.index=0; quiz.correctCount=0; quiz.answered=false;
+  renderQuizQuestion();
+}
+function renderQuizIntro(){
+  document.getElementById("quizShell").innerHTML = `
+    <div class="quiz-q" style="text-align:center;">
+      <h3>Quiz Mode</h3>
+      <p style="color:var(--ink-dim); margin-bottom:22px;">Test yourself on ICT terms and definitions. Pick a length to begin.</p>
+      <div class="row" style="justify-content:center;">
+        <button class="btn primary" data-n="10">10 questions</button>
+        <button class="btn" data-n="20">20 questions</button>
+        <button class="btn" data-n="${TERMS.length}">Full glossary</button>
+      </div>
+      <p class="footnote">Lifetime score: ${quizStats.correct} / ${quizStats.attempts} correct</p>
+    </div>`;
+  document.querySelectorAll("#quizShell [data-n]").forEach(b=>b.addEventListener("click",()=>startQuiz(parseInt(b.dataset.n))));
+}
+function renderQuizQuestion(){
+  if(quiz.index >= quiz.questions.length){ renderQuizResult(); return; }
+  const q = quiz.questions[quiz.index];
+  quiz.answered=false;
+  document.getElementById("quizShell").innerHTML = `
+    <div class="quiz-progress"><span>Question ${quiz.index+1} / ${quiz.questions.length}</span><span>Score: ${quiz.correctCount}</span></div>
+    <div class="quiz-q">
+      <h3>${q.question}</h3>
+      <div class="quiz-choices">${q.choices.map((c,i)=>`<button class="qchoice" data-i="${i}">${c}</button>`).join("")}</div>
+      <div class="quiz-explain" id="quizExplain"></div>
+      <div class="row" style="margin-top:18px; justify-content:flex-end;"><button class="btn primary" id="quizNext" style="display:none;">Next question →</button></div>
+    </div>`;
+  document.querySelectorAll(".qchoice").forEach(btn=>btn.addEventListener("click",()=>{
+    if(quiz.answered) return; quiz.answered=true;
+    const chosen = btn.textContent;
+    const correct = chosen===q.correct;
+    quizStats.attempts++; if(correct){quizStats.correct++; quiz.correctCount++;} saveQuizStats();
+    document.querySelectorAll(".qchoice").forEach(b=>{
+      b.disabled=true;
+      if(b.textContent===q.correct) b.classList.add("correct");
+      else if(b===btn) b.classList.add("wrong");
+    });
+    const exp=document.getElementById("quizExplain"); exp.textContent=(correct?"Correct. ":"Not quite. ")+q.explain; exp.classList.add("show");
+    document.getElementById("quizNext").style.display="inline-flex";
+  }));
+  document.getElementById("quizNext").addEventListener("click",()=>{quiz.index++; renderQuizQuestion();});
+}
+function renderQuizResult(){
+  const pct = Math.round(quiz.correctCount/quiz.questions.length*100);
+  document.getElementById("quizShell").innerHTML = `
+    <div class="quiz-q quiz-result">
+      <div style="color:var(--ink-dim);">You scored</div>
+      <div class="score">${quiz.correctCount}/${quiz.questions.length}</div>
+      <div style="color:var(--ink-dim); margin-bottom:20px;">${pct}% correct</div>
+      <div class="row" style="justify-content:center;">
+        <button class="btn primary" id="quizAgain">Take another quiz</button>
+        <button class="btn" data-goto2="flashcards">Review flashcards</button>
+      </div>
+    </div>`;
+  document.getElementById("quizAgain").addEventListener("click",renderQuizIntro);
+  document.querySelector("[data-goto2]").addEventListener("click",()=>goto("flashcards"));
+}
+
+/* ============================= PROGRESS ============================= */
+function renderProgress(){
+  const total = TERMS.length;
+  const knownN = [...known].filter(id=>termById[id]).length;
+  const reviewN = [...review].filter(id=>termById[id]).length;
+  const catsComplete = CATEGORIES.filter(c=>{
+    const inCat = TERMS.filter(t=>t.cat===c);
+    return inCat.length>0 && inCat.every(t=>known.has(t.id));
+  }).length;
+  document.getElementById("statGrid").innerHTML = `
+    <div class="stat"><div class="num">${knownN} / ${total}</div><div class="lbl">Terms learned</div></div>
+    <div class="stat"><div class="num">${total-knownN}</div><div class="lbl">Terms remaining</div></div>
+    <div class="stat"><div class="num">${catsComplete} / ${CATEGORIES.filter(c=>TERMS.some(t=>t.cat===c)).length}</div><div class="lbl">Categories completed</div></div>
+    <div class="stat"><div class="num">${quizStats.attempts? Math.round(quizStats.correct/quizStats.attempts*100):0}%</div><div class="lbl">Quiz accuracy (${quizStats.correct}/${quizStats.attempts})</div></div>
+    <div class="stat"><div class="num">${reviewN}</div><div class="lbl">Marked "review again"</div></div>`;
+  document.getElementById("catProgressList").innerHTML = CATEGORIES.filter(c=>TERMS.some(t=>t.cat===c)).map(c=>{
+    const inCat = TERMS.filter(t=>t.cat===c); const k = inCat.filter(t=>known.has(t.id)).length;
+    const pct = Math.round(k/inCat.length*100);
+    return `<div class="cat-progress-row"><div class="cname">${c}</div><div class="progress-bar"><div style="width:${pct}%"></div></div><div class="pct">${k}/${inCat.length}</div></div>`;
+  }).join("");
+  const reviewTerms = TERMS.filter(t=>review.has(t.id));
+  document.getElementById("reviewList").innerHTML = reviewTerms.length ? reviewTerms.map(t=>`
+    <details class="gterm"><summary><span class="gt mono">${t.term}</span><span class="gc">${t.cat}</span></summary>
+      <div class="gbody"><p style="margin:0 0 6px;">${t.normal}</p><div class="simple"><b style="color:var(--accent);">Super simple:</b> ${t.simple}</div></div>
+    </details>`).join("") : `<div class="empty">Nothing marked for review yet — nice work.</div>`;
+}
+document.getElementById("resetProgress").addEventListener("click",()=>{
+  if(!confirm("Reset all saved progress? This clears known terms, review list, and quiz score.")) return;
+  known=new Set(); review=new Set(); quizStats={attempts:0,correct:0};
+  saveSet(LS_KNOWN,known); saveSet(LS_REVIEW,review); saveQuizStats();
+  renderProgress(); renderCategoryPicker();
+});
+
+/* ============================= INIT ============================= */
+renderLearningPath();
+renderCategoryPicker();
+renderGlossary(); initGlossaryCatSelect();
+renderDemoGrid();
+renderQuizIntro();
+renderProgress();
+</script>
+</body>
+</html>
