@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ICT Trading Academy</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+  :root {
+    --bg: #FAFAF7; --surface: #FFFFFF; --border: #E4E1D8; --ink: #1B1D1F;
+    --ink-soft: #5B5F63; --panel: #F6F5F0; --primary: #2F4FD1; --primary-soft: #EEF1FD;
+    --bull: #1E8E5A; --bear: #C23B3B; --gold: #C77F17; --mistake-bg: #FBF2E4; --mistake-border: #EED9AE;
+  }
+  body.dark {
+    --bg: #14161A; --surface: #1D2026; --border: #2C2F36; --ink: #F2F1EC;
+    --ink-soft: #A9ACB3; --panel: #22252B; --primary-soft: #202A4A; --mistake-bg: #2E2716; --mistake-border: #4A3B1E;
+  }
+  * { box-sizing: border-box; font-family: 'Atkinson Hyperlegible', sans-serif; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); }
+  body.text-large .app { zoom: 1.18; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:disabled { cursor: default; opacity: 0.5; }
+  input, select, textarea { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--ink); }
+  label { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); display: block; margin-bottom: 4px; }
+  .app { min-height: 100vh; display: flex; flex-direction: column; }
+
+  .header { padding: 20px 24px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+  .brand-row { display: flex; align-items: baseline; gap: 8px; }
+  .brand-mark { background: var(--primary); color: #fff; font-weight: 700; font-size: 13px; padding: 3px 7px; border-radius: 4px; letter-spacing: 0.5px; }
+  .brand-name { font-weight: 700; font-size: 19px; }
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .progress-track { width: 160px; height: 6px; background: var(--panel); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s ease; }
+  .progress-label { font-size: 13px; color: var(--ink-soft); }
+  .header-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .mode-toggle { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .mode-btn { padding: 8px 14px; background: var(--surface); border: none; font-size: 13px; color: var(--ink-soft); }
+  .mode-btn.active { background: var(--primary-soft); color: var(--primary); font-weight: 700; }
+  .icon-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 13px; }
+
+  .nav { display: flex; gap: 4px; padding: 10px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .nav-btn { padding: 7px 12px; background: transparent; border: none; font-size: 13.5px; color: var(--ink-soft); border-radius: 6px; }
+  .nav-btn.active { background: var(--ink); color: var(--bg); font-weight: 700; }
+  .nav-btn.locked-nav { opacity: 0.5; }
+
+  .main { flex: 1; padding: 24px; max-width: 760px; width: 100%; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  h2 { font-size: 18px; margin: 18px 0 8px; }
+  .muted { color: var(--ink-soft); line-height: 1.5; margin: 0 0 18px; }
+
+  .level-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .level-card { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; position: relative; }
+  .level-card.locked { background: var(--panel); color: var(--ink-soft); cursor: default; }
+  .level-num { font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  .level-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .level-tagline { font-size: 13px; color: var(--ink-soft); }
+  .status-dot-row { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); margin-top: 10px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .back-btn { background: none; border: none; color: var(--primary); font-size: 14px; padding: 0; margin-bottom: 16px; font-weight: 700; display: block; }
+
+  .concept-card { border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 16px; background: var(--surface); }
+  .concept-term { margin: 0 0 8px; font-size: 18px; }
+  .concept-body { margin: 0 0 10px; line-height: 1.55; }
+  .easier-btn { background: none; border: 1px solid var(--primary); color: var(--primary); border-radius: 6px; padding: 6px 12px; font-size: 13px; margin-bottom: 12px; }
+  .easier-box { background: var(--primary-soft); border-radius: 6px; padding: 12px; margin-bottom: 12px; font-size: 14px; }
+  .easier-label { font-weight: 700; font-size: 12px; color: var(--primary); margin-bottom: 4px; }
+  .sub-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .sub-box { background: var(--panel); border-radius: 6px; padding: 10px; }
+  .sub-label { font-size: 11px; font-weight: 700; color: var(--ink-soft); margin-bottom: 4px; }
+  .sub-text { font-size: 13.5px; margin: 0; line-height: 1.45; }
+  .mistake-box { background: var(--mistake-bg); border-radius: 6px; padding: 10px; border: 1px solid var(--mistake-border); }
+  .mistake-label { font-size: 11px; font-weight: 700; color: #8A4B12; margin-bottom: 4px; }
+
+  .interactive-box { border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 16px; background: var(--surface); }
+  .interactive-title { font-weight: 700; margin-bottom: 10px; font-size: 14px; }
+  .readout { margin-top: 10px; font-size: 14px; min-height: 20px; }
+  .row-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .small-btn { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 13.5px; }
+  .small-btn-ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 13.5px; }
+  .primary-btn { background: var(--ink); color: var(--bg); border: none; border-radius: 6px; padding: 12px 20px; font-size: 15px; font-weight: 700; margin-top: 8px; }
+
+  .quiz-wrap { border: 1px solid var(--border); border-radius: 8px; padding: 20px; background: var(--surface); }
+  .quiz-progress { font-size: 12px; color: var(--ink-soft); font-weight: 700; }
+  .quiz-option { display: block; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--border); font-size: 14.5px; background: var(--surface); color: var(--ink); }
+  .quiz-option.correct { background: rgba(30,142,90,0.15); border-color: var(--bull); }
+  .quiz-option.incorrect { background: rgba(194,59,59,0.15); border-color: var(--bear); }
+  .quiz-explain { background: var(--panel); border-radius: 6px; padding: 12px; font-size: 14px; margin: 10px 0; line-height: 1.5; }
+
+  .result-box { border: 1px solid var(--border); border-radius: 8px; padding: 22px; background: var(--surface); }
+
+  .flash-outer { border: 1px solid var(--border); border-radius: 10px; padding: 40px 20px; text-align: center; background: var(--surface); cursor: pointer; min-height: 140px; display: flex; flex-direction: column; justify-content: center; }
+  .flash-label { font-size: 12px; color: var(--ink-soft); font-weight: 700; margin-bottom: 10px; }
+  .flash-text { font-size: 20px; font-weight: 700; line-height: 1.4; }
+
+  .footer { text-align: center; padding: 16px; font-size: 12px; color: var(--ink-soft); border-top: 1px solid var(--border); }
+
+  .dict-search { width: 100%; padding: 12px 14px; font-size: 15px; margin-bottom: 16px; }
+  .dict-entry { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; background: var(--surface); }
+  .dict-cat { font-size: 11px; color: var(--primary); font-weight: 700; margin-bottom: 4px; }
+  .dict-term { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .dict-def { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+
+  table.session-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
+  table.session-table th, table.session-table td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--border); }
+  table.session-table th { color: var(--ink-soft); font-size: 11.5px; text-transform: none; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11.5px; font-weight: 700; }
+  .pill.open { background: rgba(30,142,90,0.15); color: var(--bull); }
+  .pill.closed { background: var(--panel); color: var(--ink-soft); }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-field { display: flex; flex-direction: column; }
+  .form-field input, .form-field select, .form-field textarea { width: 100%; }
+  .journal-entry { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; background: var(--surface); font-size: 13.5px; }
+  .journal-entry .row { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat-card { background: var(--panel); border-radius: 8px; padding: 12px; text-align: center; }
+  .stat-num { font-size: 20px; font-weight: 700; }
+  .stat-label { font-size: 11.5px; color: var(--ink-soft); }
+
+  .step-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; background: var(--surface); }
+  .step-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-title { font-weight: 700; font-size: 15px; }
+  .step-why { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+
+  .table-ref { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-bottom: 16px; }
+  .table-ref th, .table-ref td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); }
+  .table-ref th { color: var(--ink-soft); font-size: 11.5px; }
+
+  .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/* ===========================================================
+   ICT Trading Academy — full build (vanilla JS, single file)
+=========================================================== */
+
+const LEVELS = [
+  { id: 0,  title: "Trading Basics", tagline: "What trading even is" },
+  { id: 1,  title: "Reading Candles", tagline: "One candle at a time" },
+  { id: 2,  title: "Timeframes", tagline: "Zooming in and out" },
+  { id: 3,  title: "Market Structure", tagline: "Highs, lows, and trend" },
+  { id: 4,  title: "Liquidity", tagline: "Where orders cluster" },
+  { id: 5,  title: "Fair Value Gaps", tagline: "Gaps candles leave behind" },
+  { id: 6,  title: "Order Blocks", tagline: "Where big moves start" },
+  { id: 7,  title: "Premium & Discount", tagline: "Expensive vs. cheap" },
+  { id: 8,  title: "Time & Sessions", tagline: "The market's clock" },
+  { id: 9,  title: "ICT Kill Zones", tagline: "Windows worth watching" },
+  { id: 10, title: "Daily & Weekly Context", tagline: "Yesterday's map" },
+  { id: 11, title: "Multi-Timeframe Analysis", tagline: "Reading top to bottom" },
+  { id: 12, title: "The ICT 2022 Model", tagline: "Putting it all together" },
+];
+
+const CONCEPTS = {
+  0: [
+    { term: "Market", normal: "A market is a place — usually digital now — where people buy and sell things, like company shares, currencies, or contracts.", simple: "A market is where buying and selling happens.", easier: "Think of a farmer's market, but instead of vegetables, people trade money, shares, and contracts.", example: "The stock market is where shares of companies like Apple are bought and sold.", lookFor: "Every market has a price that moves because people are buying and selling.", mistake: "Thinking 'the market' is one single place — it's really thousands of buyers and sellers agreeing on a price." },
+    { term: "Bid, Ask & Spread", normal: "The bid is the highest price a buyer will pay. The ask is the lowest price a seller will accept. The spread is the gap between them.", simple: "Bid = what buyers offer. Ask = what sellers want. Spread = the small gap between the two.", easier: "It's like a garage sale: you offer $5 (bid), the seller wants $7 (ask). The $2 gap is the spread.", example: "If the bid is $100.00 and the ask is $100.02, the spread is $0.02.", lookFor: "A tighter spread usually means it's cheaper and easier to trade that market.", mistake: "Forgetting the spread is a small cost every time you enter and exit a trade." },
+    { term: "Long vs. Short", normal: "Going long means buying first, hoping the price rises so you can sell later for more. Going short means selling first (often borrowed), hoping the price falls so you can buy it back cheaper.", simple: "Long = betting price goes up. Short = betting price goes down.", easier: "Long is like buying a house hoping it's worth more later. Short is more unusual: it's like selling something you borrowed, planning to buy it back cheaper.", example: "If you go long at $50 and price rises to $60, you gained $10 per unit.", lookFor: "Ask yourself: am I expecting price to go up (long) or down (short)?", mistake: "Assuming you can only make money when prices rise — shorting exists for falling prices too." },
+    { term: "Stop Loss & Take Profit", normal: "A stop loss automatically closes a losing trade at a price you choose, to limit how much you can lose. A take profit automatically closes a winning trade at a price you choose, to lock in gains.", simple: "Stop loss = your 'exit if I'm wrong' price. Take profit = your 'exit if I'm right' price.", easier: "It's like setting a timer before you start something risky — one timer says 'stop if this goes badly,' the other says 'stop, I got what I wanted.'", example: "You buy at $100, set a stop loss at $95 and a take profit at $115.", lookFor: "A trade plan should have both defined before you ever enter.", mistake: "Entering a trade without deciding your stop loss first — this is one of the most common beginner mistakes." },
+    { term: "Risk / Reward", normal: "Risk/reward compares how much you could lose to how much you could gain on a trade, usually written like 1:2 or 1:3.", simple: "It answers: 'if I'm wrong, how much do I lose — and if I'm right, how much do I gain?'", easier: "Would you risk $1 to possibly win $3? That's a 1:3 risk/reward — a good deal even if you're wrong sometimes.", example: "Risking $50 to potentially make $150 is a risk/reward ratio of 1:3.", lookFor: "A good risk/reward ratio can still lose money overall if used carelessly — it's one factor, not a guarantee.", mistake: "Believing a good risk/reward ratio means a trade is guaranteed to work out." },
+    { term: "Leverage", normal: "Leverage lets you control a larger position than your own money would normally allow, by effectively borrowing the rest. It multiplies both gains and losses.", simple: "Leverage = trading 'bigger' than your own money, which makes wins bigger and losses bigger too.", easier: "Imagine lifting a heavy box with a lever — it's easier to move, but if it swings the wrong way, it swings harder too.", example: "With 10x leverage, a 1% price move changes your position value by about 10%.", lookFor: "Higher leverage means smaller price moves can wipe out more of your account.", mistake: "Using high leverage without adjusting position size — this is a leading cause of large, fast losses." },
+  ],
+  1: [
+    { term: "Open, High, Low, Close (OHLC)", normal: "Every candle records four prices for its time period: the Open (first price), High (highest price), Low (lowest price), and Close (last price).", simple: "Each candle stores 4 numbers: where it started, its highest point, its lowest point, and where it ended.", easier: "Think of a candle as a tiny diary entry for a chunk of time: 'I started here, went up to here, dipped down to here, and ended here.'", example: "A 1-hour candle with open 100, high 108, low 98, close 104 tells you the full story of that hour.", lookFor: "The close relative to the open tells you the candle's overall direction.", mistake: "Only looking at the close and ignoring the high/low — the wick often matters just as much." },
+    { term: "Bullish vs. Bearish Candle", normal: "A bullish candle closes higher than it opened (price rose). A bearish candle closes lower than it opened (price fell). Color usually shows this at a glance.", simple: "Bullish = closed higher (usually green). Bearish = closed lower (usually red).", easier: "Green candle: price won the round. Red candle: price lost the round.", example: "Open 100, close 106 → bullish. Open 100, close 94 → bearish.", lookFor: "A string of bullish candles in a row often signals buyers are in control for now.", mistake: "Assuming one bullish candle means the price will keep rising — a single candle is not a trend." },
+    { term: "Wick vs. Body", normal: "The body is the thick part between open and close. The wicks (or shadows) are the thin lines above and below showing the full high-to-low range.", simple: "Body = open to close. Wick = the thin lines showing the extremes reached.", easier: "The body is the 'main story.' The wicks are like footnotes showing how far price wandered before settling down.", example: "A long lower wick means price dropped sharply, then recovered before the candle closed.", lookFor: "Long wicks can show rejection — price tried to go somewhere and got pushed back.", mistake: "Ignoring wicks entirely and only reading the body." },
+    { term: "Timeframe", normal: "A timeframe is how much real time one candle represents — for example, 1 minute, 15 minutes, 1 hour, or 1 day.", simple: "Timeframe = how much time is packed into one candle.", easier: "A daily candle is like a whole day summarized in one shape. A 1-minute candle is like a single sentence from that day.", example: "On a 1-hour chart, each candle summarizes 60 minutes of price action.", lookFor: "Higher timeframes (daily, 4-hour) tend to show broader context; lower timeframes show more detail and more noise.", mistake: "Trying to read a 1-minute chart before understanding the bigger picture on a higher timeframe." },
+  ],
+  2: [
+    { term: "Common Timeframes", normal: "Charts are commonly viewed at a ladder of timeframes: 1-minute, 5-minute, 15-minute, 30-minute, 1-hour, 4-hour, Daily, and Weekly.", simple: "There's a whole ladder of timeframes, from 1-minute up to Weekly.", easier: "Think of a zoom slider on a map — 1-minute is zoomed all the way into a single street, Weekly is zoomed out to see the whole country.", example: "A trader might check the Daily chart, then zoom into the 15-minute chart of the same market.", lookFor: "Each rung on the ladder shows the same market at a different level of detail.", mistake: "Assuming there's only one 'correct' timeframe to trade — different timeframes suit different goals." },
+    { term: "Higher Timeframe vs. Lower Timeframe", normal: "A higher timeframe (like Daily or 4-hour) is generally used for broader context. A lower timeframe (like 15-minute or 5-minute) is generally used for more detailed timing.", simple: "Higher timeframe = big picture. Lower timeframe = fine detail.", easier: "The higher timeframe is like reading the table of contents of a book. The lower timeframe is like reading one specific paragraph closely.", example: "A trader might use the 4-hour chart to see the overall trend, then the 5-minute chart to time an entry within that trend.", lookFor: "Context from a higher timeframe can help make sense of what's happening on a lower one.", mistake: "Reading only a low timeframe chart with no higher timeframe context at all." },
+    { term: "Same Market, Different Story", normal: "The exact same hours of trading can look calm on a higher timeframe chart and look busy or chaotic on a lower timeframe chart of the same period.", simple: "The same 3 hours of trading can look totally different depending on which timeframe you view it on.", easier: "It's like watching a sports game highlight reel versus watching every single second of the game — same event, very different amount of detail.", example: "A single 4-hour candle might contain dozens of separate 5-minute candles, each with their own ups and downs.", lookFor: "If a lower timeframe feels chaotic, zooming out to a higher timeframe can help make sense of it.", mistake: "Judging a market as 'crazy' or 'broken' just because a low timeframe looks messy." },
+    { term: "A Simple Top-Down Framework (Example Only)", normal: "One common example framework is: Daily and 4-hour charts for broader context, 1-hour and 15-minute for setup context, and 5-minute or 1-minute for detailed execution.", simple: "One example: big timeframes = context, medium timeframes = setup, small timeframes = execution.", easier: "Like planning a road trip: the map (Daily/4H) shows the route, the GPS directions (1H/15M) show the next turns, and glancing at the road (5M/1M) is for the final moment of steering.", example: "Daily shows an uptrend, 1H shows price near a key level, 5M is used just to time the entry.", lookFor: "This is one example structure, not a rule that applies to every trader or every market.", mistake: "Treating this specific timeframe combination as a mandatory, universal rule." },
+  ],
+  3: [
+    { term: "Swing High & Swing Low", normal: "A swing high is a candle's high point that is higher than the candles immediately around it. A swing low is a low point that is lower than the candles immediately around it.", simple: "Swing high = a clear peak. Swing low = a clear dip.", easier: "Picture a mountain range from far away — the tips of the peaks are swing highs, the bottoms of the valleys are swing lows.", example: "If price rises, then pulls back, then rises again, the top of that first rise is a swing high.", lookFor: "Swing points are the building blocks for reading trend and structure.", mistake: "Marking every small wiggle as a swing point instead of the clear, obvious ones." },
+    { term: "Higher Highs / Higher Lows (Trend)", normal: "A series of higher highs and higher lows generally describes an uptrend. Lower highs and lower lows generally describe a downtrend.", simple: "Peaks and dips both climbing = uptrend. Peaks and dips both falling = downtrend.", easier: "Uptrend is like climbing stairs — each step (and each landing) is higher than the last.", example: "Swing lows at 100, then 105, then 110 — each low is higher than the last, suggesting an uptrend.", lookFor: "A trend is a pattern across several swing points, not just one.", mistake: "Calling a trend after seeing just one higher high, without a higher low to confirm it." },
+    { term: "Break of Structure (BOS)", normal: "A break of structure happens when price closes beyond a prior swing high (in an uptrend) or swing low (in a downtrend), suggesting the existing trend is continuing.", simple: "BOS = price breaks past the last important peak or dip, in the direction it was already going.", easier: "If someone kept beating their own personal best in a race, each new record is like a 'break of structure' in their favor.", example: "In an uptrend, price closing above the last swing high is a bullish break of structure.", lookFor: "A break of structure is often used as a clue that the current trend is still active.", mistake: "Confusing a break of structure (trend continuing) with a market structure shift (trend possibly reversing)." },
+    { term: "Market Structure Shift (MSS)", normal: "A market structure shift happens when price breaks structure in the opposite direction of the current trend, suggesting the trend may be changing.", simple: "MSS = a clue the trend might be flipping.", easier: "If someone walking north suddenly turns and starts walking south, that turn is like an MSS.", example: "In a downtrend, price breaking above a recent swing high could be an early sign of a market structure shift.", lookFor: "An MSS is a signal to pay closer attention, not proof the trend has reversed for good.", mistake: "Treating every small structure shift as a guaranteed full reversal." },
+  ],
+  4: [
+    { term: "Liquidity", normal: "Liquidity refers to clusters of resting orders — like stop losses and pending orders — that tend to build up around obvious price levels.", simple: "Liquidity = a pool of orders sitting around obvious price levels.", easier: "Imagine a pool of orders sitting just above a recent high, like puddles collecting at the bottom of a hill. Price sometimes 'drains' through them.", example: "Many traders place stop losses just above a recent high — that cluster of orders is liquidity.", lookFor: "Obvious, easy-to-spot highs and lows are exactly where liquidity tends to build up.", mistake: "Assuming liquidity is a signal by itself — it only matters in how price reacts around it." },
+    { term: "Buy-Side & Sell-Side Liquidity (BSL/SSL)", normal: "Buy-side liquidity (BSL) tends to sit above recent highs. Sell-side liquidity (SSL) tends to sit below recent lows.", simple: "BSL = above recent highs. SSL = below recent lows.", easier: "Highs act like a ceiling with orders resting just above it (BSL). Lows act like a floor with orders resting just below it (SSL).", example: "A recent swing high often has buy-side liquidity resting just above it.", lookFor: "Ask: where are the obvious highs and lows that other traders would also notice?", mistake: "Only ever looking for liquidity above price and forgetting to check below, or vice versa." },
+    { term: "Equal Highs / Equal Lows", normal: "When price touches the same high (or low) more than once, it creates equal highs (or lows) — an especially obvious liquidity magnet.", simple: "Equal highs/lows = the same level touched more than once.", easier: "It's like two arrows landing on the exact same spot on a dartboard — that spot stands out.", example: "If price touches 150 twice without breaking through, those are equal highs.", lookFor: "Equal highs/lows are some of the easiest liquidity levels to spot on a chart.", mistake: "Assuming equal highs must break immediately — timing still matters." },
+    { term: "Liquidity Sweep", normal: "A liquidity sweep is when price briefly pushes through an obvious high or low, likely triggering orders resting there, and then potentially reverses.", simple: "A sweep is a quick push through a level to trigger orders, that may then reverse.", easier: "Like a wave that rushes just past the sandcastle line, grabs a few pebbles, then pulls back.", example: "Price spikes 5 points above a recent high, then reverses sharply — a possible liquidity sweep.", lookFor: "A sweep alone is not proof of a reversal — it's a clue to watch closely, not a signal to act alone.", mistake: "Treating every sweep as a guaranteed reversal signal — sometimes price keeps going." },
+  ],
+  5: [
+    { term: "Fair Value Gap (FVG)", normal: "A Fair Value Gap is usually identified using three consecutive candles, where the range of the first candle and the range of the third candle don't overlap — leaving a gap.", simple: "An FVG is a small gap left behind when price moves quickly across three candles.", easier: "Imagine three people jumping across stepping stones so fast that one stone in the middle never gets touched. That untouched spot is like the FVG.", example: "If candle 1 has a high of 100 and candle 3 has a low of 104, the untouched 100–104 zone is a Fair Value Gap.", lookFor: "FVGs tend to form during fast, strong moves rather than slow, choppy ones.", mistake: "Looking for an FVG on every single candle instead of only during genuinely fast moves." },
+    { term: "Bullish vs. Bearish FVG", normal: "A bullish FVG forms during a strong upward push in price. A bearish FVG forms during a strong downward push in price.", simple: "Bullish FVG = gap left during a fast move up. Bearish FVG = gap left during a fast move down.", easier: "It's labeled by which direction price was racing when it left the gap behind.", example: "Three candles rocketing higher with a gap between candle 1 and candle 3 would be a bullish FVG.", lookFor: "The direction of the FVG usually matches the direction of the move that created it.", mistake: "Mislabeling an FVG's direction by only glancing at one candle instead of all three." },
+    { term: "FVG Fill & Consequent Encroachment", normal: "'Filling' an FVG means price returns and trades back through part or all of the gap. The midpoint of the gap is sometimes called consequent encroachment.", simple: "Fill = price comes back and revisits the gap. The gap's midpoint has its own name: consequent encroachment.", easier: "If the gap is a doorway price left open, 'filling' it is like walking back through that same doorway later.", example: "Price races up leaving a gap between 100–104, then days later dips back down to 102 (the midpoint) before continuing higher.", lookFor: "Some traders watch how price behaves specifically at the gap's midpoint.", mistake: "Assuming a gap must be completely filled, all at once, or not at all — partial fills happen too." },
+    { term: "Inverse FVG", normal: "When price fully closes back through an FVG, some traders treat that zone as potentially flipping roles — this is a more advanced and debated interpretation.", simple: "An 'inverse FVG' is the idea that a gap can flip roles once price fully breaks back through it.", easier: "Like a door that used to only open one way suddenly swinging open the other way too.", example: "A bullish FVG that price later closes fully below might be watched as a possible resistance-like zone going forward.", lookFor: "This is one of the more subjective, debated ICT ideas — different traders apply it differently.", mistake: "Treating the inverse FVG idea as settled fact rather than one interpretation among traders." },
+  ],
+  6: [
+    { term: "Order Block", normal: "An order block is often described as the last opposite-direction candle before a strong displacement move — used by some traders as a possible reaction zone.", simple: "An order block is roughly 'the last down candle before a big move up' (or vice versa).", easier: "Picture the last deep breath someone takes right before sprinting — the order block is like that last pause before the big move.", example: "If price prints one red candle and then rips upward for several strong green candles, that red candle may be marked as a bullish order block.", lookFor: "Order blocks are usually identified right next to a strong, fast move.", mistake: "Marking an order block after every candle instead of only near genuinely strong moves." },
+    { term: "Bullish vs. Bearish Order Block", normal: "A bullish order block is typically the last down candle before a strong move up. A bearish order block is typically the last up candle before a strong move down.", simple: "Bullish OB = last down candle before a rally. Bearish OB = last up candle before a drop.", easier: "It's named for the direction of the big move that followed it, not the candle's own color.", example: "A single red candle just before five strong green candles could be labeled a bullish order block.", lookFor: "Check what happened right after the candle, not just the candle itself.", mistake: "Labeling a candle an order block just because of its color, without checking what followed." },
+    { term: "Breaker & Mitigation", normal: "A breaker generally describes an order block that failed, with price breaking back through it. Mitigation refers to price returning to a previously identified order block area.", simple: "Breaker = an order block that failed. Mitigation = price coming back to visit an order block zone.", easier: "A breaker is like a fence that got knocked down — it didn't hold. Mitigation is simply price 'checking back in' on an old zone.", example: "Price breaks below a bullish order block that was expected to hold — some traders would call that block a breaker.", lookFor: "Ask whether the zone held (order block) or failed and got run through (breaker).", mistake: "Assuming every order block will always hold — order blocks fail fairly often." },
+    { term: "A Note on Subjectivity", normal: "ICT terminology, including order blocks, can be interpreted differently by different traders. Using clearly defined personal rules is more useful than vague labels.", simple: "Different traders draw order blocks differently — having your own clear rules matters more than the label itself.", easier: "It's a bit like two people describing the 'best seat' in a movie theater — they might not agree, because it's partly a judgment call.", example: "One trader might mark the last down candle as the order block; another might use the last down candle with the largest range instead.", lookFor: "Whatever rule you use, apply it consistently so you can learn from your own results.", mistake: "Assuming order blocks are an exact, universally agreed-upon science rather than a somewhat subjective tool." },
+  ],
+  7: [
+    { term: "Dealing Range", normal: "A dealing range is typically drawn between a recent, significant swing high and swing low.", simple: "A dealing range is just the space between a recent significant high and low.", easier: "Think of it as drawing a box around the 'playing field' price has recently been moving inside.", example: "If the recent swing high is 120 and the recent swing low is 100, the dealing range is 100–120.", lookFor: "Look for a genuinely significant swing high and low, not tiny, minor wiggles.", mistake: "Drawing a dealing range from two random points instead of clear significant swings." },
+    { term: "Equilibrium (50%)", normal: "Equilibrium is the midpoint — the 50% level — of the dealing range.", simple: "Equilibrium is just the exact middle of the range.", easier: "If the range were a seesaw, equilibrium is the exact center point where it balances.", example: "In a 100–120 dealing range, equilibrium sits at 110.", lookFor: "Equilibrium is a reference point, not a level with special magic power.", mistake: "Assuming price must always react strongly right at equilibrium." },
+    { term: "Premium", normal: "Price trading in the upper half of a dealing range is considered to be in premium — relatively expensive compared to the range.", simple: "Premium = the upper half of the range.", easier: "Like the top shelf at the store — the 'pricier' section relative to everything else on display.", example: "In a 100–120 range, price at 116 would be considered in premium.", lookFor: "Premium is relative to the current range, not an absolute judgment about the whole market.", mistake: "Assuming 'premium' means price will definitely fall from there." },
+    { term: "Discount", normal: "Price trading in the lower half of a dealing range is considered to be in discount — relatively cheap compared to the range.", simple: "Discount = the lower half of the range.", easier: "Like the clearance section at the store — the 'cheaper' section relative to everything else on display.", example: "In a 100–120 range, price at 104 would be considered in discount.", lookFor: "Discount is relative to the current range, not a guarantee price will rise from there.", mistake: "Treating 'discount' as a buy signal by itself, without any other confirmation." },
+  ],
+  8: [
+    { term: "Trading Sessions", normal: "Markets are often discussed in terms of major regional trading sessions — roughly tied to normal business hours in Sydney, Tokyo, London, and New York.", simple: "A 'session' is roughly the active trading hours tied to a major financial city.", easier: "It's a bit like time zones for a global relay race — as one city's session winds down, another one is just waking up.", example: "The New York session generally overlaps with the tail end of the London session.", lookFor: "Different sessions can have noticeably different levels of activity.", mistake: "Assuming all sessions behave identically — activity levels and behavior can vary by session." },
+    { term: "Session Overlaps", normal: "A session overlap is a period where two regional sessions are open at the same time, often associated with increased activity.", simple: "An overlap is when two sessions are both open together — often a busier stretch.", easier: "Like a shift-change at a store when both the outgoing and incoming staff are on the floor at once — more people, more happening.", example: "The London and New York overlap is commonly discussed as an active window.", lookFor: "Overlaps are worth being aware of when thinking about typical activity levels.", mistake: "Assuming higher activity during an overlap guarantees a particular price direction." },
+    { term: "Why Session Times Shift With Daylight Saving", normal: "A session's start time in your local clock can shift throughout the year because daylight saving time changes are not synchronized across every country.", simple: "Your local clock time for a session can change during the year because not every country starts/ends daylight saving on the same date.", easier: "Imagine two friends in different cities who both 'spring forward' their clocks — but on different weekends. For a few weeks, the usual time gap between them is different than normal.", example: "The London session's clock-time in New York can shift by an hour for a few weeks each spring and fall.", lookFor: "Use a proper timezone tool (like the Session Clock in this app) instead of memorizing one fixed clock time.", mistake: "Assuming a session always starts at the exact same local clock time all year round." },
+  ],
+  9: [
+    { term: "What a Kill Zone Is", normal: "A kill zone generally refers to a specific window of time within a session that some traders pay closer attention to.", simple: "A kill zone is just a smaller time window inside a session that some traders watch closely.", easier: "If a session is a whole workday, a kill zone is like the busiest hour of that workday.", example: "Some traders focus specifically on the New York AM window rather than the entire New York session.", lookFor: "A kill zone is a window of attention, not a guarantee that something specific will happen.", mistake: "Assuming a kill zone name means price is guaranteed to move a certain way during it." },
+    { term: "Common Kill Zone Windows (Examples)", normal: "Commonly discussed example windows include the London kill zone, the New York AM window, the New York PM window, and the London/New York overlap.", simple: "A few commonly discussed examples: London window, New York AM, New York PM, and the London/New York overlap.", easier: "Think of these as commonly suggested 'best times to check the game' rather than official rules.", example: "A trader following this framework might specifically watch the New York AM window rather than randomly checking charts all day.", lookFor: "These are commonly cited examples, not one single official universal schedule.", mistake: "Treating one specific set of kill zone times as a fixed law that applies to every market and every trader." },
+    { term: "Using Configurable Windows", normal: "Because exact clock times shift with daylight saving, it's more reliable to check your local time using a timezone/session tool than to memorize a single fixed time.", simple: "Instead of memorizing one fixed clock time, use a timezone tool to check the current local time of a window.", easier: "It's the same idea as checking a flight-time converter instead of guessing what time a flight lands in your city.", example: "The Session Clock tool in this app converts session and kill zone windows into your selected local time automatically.", lookFor: "A tool that accounts for daylight saving automatically is more reliable than a fixed memorized time.", mistake: "Relying on a memorized UTC offset instead of a tool that properly accounts for daylight saving." },
+  ],
+  10: [
+    { term: "Previous Day/Week High & Low (PDH/PDL/PWH/PWL)", normal: "PDH, PDL, PWH, and PWL refer to the previous day's high and low, and the previous week's high and low — commonly used as reference levels.", simple: "PDH = yesterday's high. PDL = yesterday's low. PWH/PWL = last week's high/low.", easier: "Think of them like yesterday's high score and low score on a scoreboard — reference points for today's game.", example: "A trader might note that price is currently trading just below the previous day's high (PDH).", lookFor: "These levels are reference points other traders are also likely watching.", mistake: "Assuming price must always react at these levels — they're reference points, not guarantees." },
+    { term: "Daily, Weekly & Monthly Opens", normal: "The 'open' of a period is the price at the very start of that period, often used as a simple reference point.", simple: "The 'open' is just the price right when the day, week, or month began.", easier: "It's like the starting line of a race — a fixed point to measure everything else against.", example: "If price opened the day at 100 and is now at 106, some traders note that price is trading above the daily open.", lookFor: "Ask whether current price is above or below the relevant open.", mistake: "Assuming the open itself is a support or resistance level with special power." },
+    { term: "Reading Levels Around Price", normal: "A useful daily habit is asking what important levels sit above and below current price, and where liquidity might be located near them.", simple: "Ask: what important levels are above price right now, and what important levels are below it?", easier: "It's like checking a map for the nearest landmarks in both directions before deciding where to walk.", example: "A trader might note PDH sits above current price, and a recent equal-lows level sits below it.", lookFor: "Building this habit ties directly back into what you learned about liquidity in Level 4.", mistake: "Only ever checking levels above price, or only below, instead of both directions." },
+  ],
+  11: [
+    { term: "Step 1–2: Daily & 4H — Establish Context", normal: "The first steps of a top-down analysis usually involve checking the Daily and 4-hour charts to understand the broader picture.", simple: "Start by looking at the Daily and 4H charts to get the big picture.", easier: "Like reading the back cover of a book before diving into chapter one.", example: "On the Daily chart, a trader notices the market has been making higher highs and higher lows.", lookFor: "Ask: what's the broader story here — trend, range, or something in between?", mistake: "Skipping straight to a low timeframe chart without any higher timeframe context at all." },
+    { term: "Step 3: 1H — Locate Price Relative to Levels", normal: "The 1-hour chart is often used to see where current price sits relative to important levels identified on higher timeframes.", simple: "Use the 1H chart to see where price is compared to the important levels you already found.", easier: "Like checking exactly where you are on the map after already picking your general route.", example: "A trader notices price is currently sitting right at a level marked on the 4H chart.", lookFor: "This step connects the big picture (Daily/4H) with more specific price action.", mistake: "Jumping to the 1H chart without having identified any higher timeframe levels first." },
+    { term: "Step 4–5: 15M & 5M — Watch for a Setup and Confirmation", normal: "Lower timeframes like 15-minute and 5-minute are often used to watch for a setup developing, and then for confirmation that it's playing out.", simple: "Use 15M and 5M to watch for a possible setup forming, and then for confirmation.", easier: "Like watching a pot slowly start to simmer (setup), then watching it actually reach a boil (confirmation) before acting.", example: "On the 15M chart, a trader watches for a market structure shift after price reaches a key level.", lookFor: "This step is about patience — waiting for the setup to actually develop rather than forcing one.", mistake: "Entering before any real confirmation has appeared on the lower timeframe." },
+    { term: "Step 6: 1M — Use Sparingly", normal: "The 1-minute chart contains more noise than higher timeframes, and beginners generally don't need to use it.", simple: "The 1-minute chart is noisy, and beginners usually don't need it.", easier: "Reading a 1-minute chart before you're ready is like trying to read tiny fine print from across the room — a lot of strain for not much extra clarity.", example: "A beginner focusing on the 15M and 5M charts is generally better served skipping the 1M chart entirely for now.", lookFor: "If a chart feels overwhelming, it might be too low a timeframe for where you are in your learning.", mistake: "Jumping straight to the 1-minute chart as a beginner because it 'feels' more precise." },
+  ],
+};
+
+const ICT_MODEL_STEPS = [
+  { title: "Establish context / bias", why: "Understanding the broader picture first helps everything that follows make more sense — it's the foundation the rest of the sequence builds on." },
+  { title: "Identify important liquidity", why: "Knowing where obvious highs and lows sit helps you understand where other traders' orders may be resting." },
+  { title: "Wait for price to interact with liquidity", why: "Patience here avoids acting before there's anything meaningful happening near that liquidity." },
+  { title: "Look for a liquidity sweep", why: "A sweep can be an early clue that the obvious level has done its job of triggering orders." },
+  { title: "Look for displacement", why: "A strong, fast move can suggest real conviction behind the recent price action, rather than random drift." },
+  { title: "Look for market structure shift", why: "An MSS is one more piece of evidence that the character of the move may be changing." },
+  { title: "Identify a potential FVG / order-block area", why: "These are commonly used as possible reference zones for where price might react on a retracement." },
+  { title: "Wait for price to retrace", why: "Chasing price immediately, without a retracement, often means a worse entry price and a wider stop." },
+  { title: "Define invalidation", why: "Deciding in advance what would prove the idea wrong keeps a losing idea from turning into a bigger loss." },
+  { title: "Define a logical target", why: "Having a target set in advance avoids getting greedy or bailing out too early based on emotion." },
+  { title: "Calculate risk/reward", why: "This turns the idea into a concrete decision: is the potential gain worth the defined risk?" },
+  { title: "Review the trade afterward", why: "Reviewing — win or lose — is how the whole process actually improves over time." },
+];
+
+const QUIZZES = {
+  0: [
+    { q: 'What does it mean to go "long" in a trade?', options: ["Buying, hoping the price rises", "Selling first, hoping the price falls", "Holding only cash", "Borrowing shares to sell"], correct: 0, explain: "Going long means buying with the hope of selling later at a higher price." },
+    { q: "What does a stop loss do?", options: ["Guarantees a profit", "Automatically closes a losing trade at a set price", "Increases your leverage", "Predicts the next price move"], correct: 1, explain: "A stop loss limits how much you can lose by closing the trade automatically." },
+    { q: "A risk/reward ratio of 1:3 means:", options: ["Risking $1 to potentially make $3", "Risking $3 to make $1", "A guaranteed 3x profit", "Trading 3 times a day"], correct: 0, explain: "1:3 compares potential loss to potential gain — risking 1 unit for a chance at 3." },
+    { q: 'The "spread" is:', options: ["The gap between the bid and ask price", "The total number of open trades", "A type of chart", "A trading session name"], correct: 0, explain: "The spread is simply the difference between what buyers offer and sellers ask." },
+    { q: "Leverage lets you:", options: ["Trade a larger position with less of your own money — increasing both gains and losses", "Guarantee a profit", "Avoid all risk", "Remove the need for a stop loss"], correct: 0, explain: "Leverage magnifies outcomes in both directions, which is why it increases risk." },
+  ],
+  1: [
+    { q: "On a bullish candle, where does the close usually sit relative to the open?", options: ["Above the open", "Below the open", "Exactly at the open", "Candles don't have an open"], correct: 0, explain: "Bullish means price rose over the candle, so the close is higher than the open." },
+    { q: 'The "wick" of a candle shows:', options: ["The highest and lowest price reached", "Only the closing price", "The trading volume", "The session name"], correct: 0, explain: "Wicks show the full range price traveled, beyond just open and close." },
+    { q: "Open 100, High 108, Low 98, Close 104 — is this candle bullish or bearish?", options: ["Bullish", "Bearish"], correct: 0, explain: "The close (104) is higher than the open (100), so it's bullish." },
+    { q: 'A "timeframe" of 15 minutes means:', options: ["Each candle represents 15 minutes of price action", "The chart updates every 15 seconds", "You must trade within 15 minutes", "The market is only open for 15 minutes"], correct: 0, explain: "Timeframe describes how much time is packed into a single candle." },
+    { q: "The candle body is formed by:", options: ["The open and close prices", "The high and low prices", "The wick only", "The previous candle's close"], correct: 0, explain: "The thick body spans from the open price to the close price." },
+  ],
+  2: [
+    { q: "Which timeframe would usually show more short-term noise?", options: ["A 1-minute chart", "A Daily chart", "A Weekly chart", "A Monthly chart"], correct: 0, explain: "Lower timeframes pack far less time into each candle, so small wiggles show up more." },
+    { q: "A higher timeframe is generally used for:", options: ["Broader context", "Precise second-by-second entries", "Removing all risk", "Guaranteeing profit"], correct: 0, explain: "Higher timeframes summarize more time per candle, which is useful for the bigger picture." },
+    { q: "In the example top-down framework, which timeframes are mainly used for context?", options: ["Daily and 4H", "1M and 5M", "Only 1H", "Only Weekly"], correct: 0, explain: "The example framework uses Daily/4H for broader context before narrowing down." },
+    { q: "Is the exact timeframe combination in a top-down framework a universal rule everyone must follow?", options: ["No — it's one example approach", "Yes, it's mandatory for everyone", "Only on Fridays", "Only for forex"], correct: 0, explain: "It's presented as one example structure, not a fixed law." },
+    { q: "Why might the same 3 hours of trading look totally different on a 1-hour chart vs. a 1-minute chart?", options: ["Each candle summarizes a different amount of time, hiding or revealing detail", "The price itself is different on each chart", "Only the 1-hour chart is real", "Minute charts are inaccurate by design"], correct: 0, explain: "Higher timeframe candles average out detail that's fully visible on lower timeframes." },
+  ],
+  3: [
+    { q: "A swing high is:", options: ["A price point higher than the candles immediately around it", "The highest price ever traded", "The opening price of the day", "A type of pending order"], correct: 0, explain: "It's a local peak — higher than its immediate neighbors, not an all-time record." },
+    { q: "Higher highs and higher lows generally describe:", options: ["An uptrend", "A downtrend", "A ranging market", "A liquidity sweep"], correct: 0, explain: "Both swing highs and lows climbing together is the classic definition of an uptrend." },
+    { q: "A break of structure happens when:", options: ["Price closes beyond a prior swing high/low in the trend's direction", "Price stays inside a tight range", "The market closes for the day", "A candle forms with no wick"], correct: 0, explain: "A BOS confirms the existing trend is continuing past a previous swing point." },
+    { q: "A Market Structure Shift (MSS) suggests:", options: ["The prior trend may be changing direction", "The market is closed", "Leverage has increased", "The spread has widened"], correct: 0, explain: "An MSS is a break in the opposite direction of the trend — an early reversal clue." },
+    { q: "In a downtrend, you'd typically expect to see:", options: ["Lower highs and lower lows", "Higher highs and higher lows", "Only bullish candles", "No swing points at all"], correct: 0, explain: "A downtrend is defined by both swing highs and swing lows stepping downward." },
+  ],
+  4: [
+    { q: '"Liquidity" in this context refers to:', options: ["Clusters of resting orders near obvious price levels", "How fast a candle forms", "The total number of traders online", "A type of indicator"], correct: 0, explain: "Liquidity here means pools of orders — like stops — sitting around obvious levels." },
+    { q: '"Buy-side liquidity" (BSL) tends to sit:', options: ["Above recent highs", "Below recent lows", "Exactly at the daily open", "Only on daily charts"], correct: 0, explain: "Orders like stop losses on short positions tend to sit just above recent highs." },
+    { q: '"Equal highs" often draw attention because:', options: ["Many traders may have orders clustered around that same level", "They guarantee an immediate reversal", "They only occur once a year", "They are always fake"], correct: 0, explain: "A repeated level is an especially obvious, easy-to-spot liquidity magnet." },
+    { q: "A liquidity sweep is when:", options: ["Price briefly pushes through a level to trigger orders, then may reverse", "Price permanently breaks a level with no reversal", "A broker cancels your order", "Liquidity disappears from the market entirely"], correct: 0, explain: "A sweep is a quick push-and-potential-reverse move through an obvious level." },
+    { q: "Does a liquidity sweep guarantee price will reverse afterward?", options: ["No — it's a clue to watch for, not a guarantee", "Yes, always", "Only on Fridays", "Only in forex markets"], correct: 0, explain: "Nothing in trading is guaranteed — a sweep is one clue among several, not a certainty." },
+  ],
+  5: [
+    { q: "A Fair Value Gap is typically identified using:", options: ["Three consecutive candles where the 1st and 3rd don't overlap", "A single candle's wick", "The daily open", "Leverage settings"], correct: 0, explain: "The gap sits between the first and third candle's ranges in a fast three-candle move." },
+    { q: "A bullish FVG typically forms during:", options: ["A strong upward push in price", "A sideways range", "Market close", "A spread widening"], correct: 0, explain: "Fast upward displacement is what tends to leave an untouched gap behind." },
+    { q: '"FVG fill" refers to:', options: ["Price returning to trade back through part or all of the gap", "The FVG becoming permanently invalid", "A broker filling your order", "The candle's wick disappearing"], correct: 0, explain: "Filling simply means price revisits the gap area." },
+    { q: "The midpoint of a FVG is sometimes called:", options: ["Consequent encroachment", "The swing high", "The spread", "The leverage point"], correct: 0, explain: "Consequent encroachment specifically refers to the gap's midpoint." },
+    { q: "Does every FVG eventually get filled?", options: ["Not necessarily — it's a pattern to watch, not a guarantee", "Yes, always, on the same day", "Only on Fridays", "Never"], correct: 0, explain: "Like most patterns discussed here, there's no guarantee attached." },
+  ],
+  6: [
+    { q: "An order block is often described as:", options: ["The last opposite candle before a strong displacement move", "The very first candle of the day", "A type of stop loss", "A broker fee"], correct: 0, explain: "It's defined relative to the strong move that followed it." },
+    { q: "A bullish order block is typically associated with:", options: ["A move upward following it", "A move downward following it", "No price movement at all", "Only daily charts"], correct: 0, explain: "It's named for the direction of the strong move that came after it." },
+    { q: '"Mitigation" refers to:', options: ["Price returning to a previously identified order block area", "A type of leverage", "A broker canceling a trade", "A candle's wick"], correct: 0, explain: "Mitigation describes price coming back to revisit a prior order block zone." },
+    { q: "Why does the lesson warn about subjectivity with order blocks?", options: ["Different traders can define and label them differently, so clear personal rules matter", "Order blocks are officially standardized by regulators", "They only exist on daily charts", "They guarantee a bounce"], correct: 0, explain: "Order block identification varies by trader, which is why consistent personal rules matter." },
+    { q: 'A "breaker" generally describes:', options: ["An order block that failed and price broke back through it", "A type of chart pattern unrelated to order blocks", "A broker's trading fee", "A level with no significance"], correct: 0, explain: "A breaker is essentially a failed order block that price has broken through." },
+  ],
+  7: [
+    { q: 'The "equilibrium" of a dealing range is:', options: ["The midpoint (50%) between the range high and low", "The highest point", "The lowest point", "A type of order"], correct: 0, explain: "Equilibrium is simply the exact midpoint of the range." },
+    { q: "Price trading in the upper half of a dealing range is considered to be in:", options: ["Premium", "Discount", "Equilibrium exactly", "A swing low"], correct: 0, explain: "The upper half of the range is referred to as premium." },
+    { q: "Price trading in the lower half of a dealing range is considered to be in:", options: ["Discount", "Premium", "A breaker", "A spread"], correct: 0, explain: "The lower half of the range is referred to as discount." },
+    { q: "A dealing range is typically drawn between:", options: ["A recent significant swing high and swing low", "The daily open and close only", "Two random candles", "The highest and lowest price ever traded"], correct: 0, explain: "It's anchored to a recent, genuinely significant swing high and low." },
+    { q: 'Is trading in "discount" a guarantee that price will rise?', options: ["No — it's a relative reference point, not a guarantee", "Yes, always", "Only during London session", "Only for forex"], correct: 0, explain: "Premium and discount are relative reference points, not predictions." },
+  ],
+  8: [
+    { q: "Which pair of sessions is often cited for having significant overlap and activity?", options: ["London and New York", "Tokyo and Sydney only", "Only weekends", "Sessions never overlap"], correct: 0, explain: "The London/New York overlap is a commonly discussed active window." },
+    { q: "Why can a session's start time in your local clock shift throughout the year?", options: ["Because daylight saving time changes are not synchronized across countries", "Because the market changes its own clock randomly", "Because leverage changes", "Because of the spread"], correct: 0, explain: "Different countries start and end daylight saving on different dates, shifting the usual time gap." },
+    { q: "The four major regional sessions commonly discussed are:", options: ["Sydney, Tokyo, London, New York", "Paris, Berlin, Rome, Madrid", "Only London and New York", "Only Tokyo"], correct: 0, explain: "These four cities anchor the commonly discussed regional trading sessions." },
+    { q: 'A "session overlap" is:', options: ["A period where two sessions are open at the same time", "A broker fee", "A type of candle", "A leverage setting"], correct: 0, explain: "It's simply the window where two regional sessions are both active." },
+    { q: "What tool in this app helps convert session times to your local time?", options: ["The Session Clock", "The Flashcards", "The Risk Calculator", "The Journal"], correct: 0, explain: "The Session Clock tool handles the timezone and daylight-saving conversion for you." },
+  ],
+  9: [
+    { q: 'A "kill zone" generally refers to:', options: ["A specific time window within a session some traders focus on", "A permanently banned trading time", "A type of candle pattern", "A broker's holiday"], correct: 0, explain: "It's simply a narrower window of attention within a broader session." },
+    { q: "Why might exact kill zone clock times change throughout the year?", options: ["Daylight saving time shifts can change the local clock time of a session", "The market itself moves the zone", "Brokers vote on it monthly", "They never change"], correct: 0, explain: "The underlying session times are fixed to their home timezone, but your local conversion shifts with daylight saving." },
+    { q: "Which is commonly cited as an overlap period with above-average activity?", options: ["The London / New York overlap", "Tokyo / Sydney overlap only", "The weekend session", "There is no such thing"], correct: 0, explain: "This overlap is the one most commonly discussed for increased activity." },
+    { q: "Kill zone windows in this course are presented as:", options: ["Configurable examples, not one fixed universal schedule", "One unchangeable law", "Guaranteed profit windows", "Irrelevant details"], correct: 0, explain: "They're offered as commonly discussed examples rather than a rigid universal rule." },
+    { q: "What's the best way to find a kill zone's start time in your own local time?", options: ["Use a timezone/session conversion tool", "Guess based on UTC alone", "Assume it's always 9am local", "Ignore timezones entirely"], correct: 0, explain: "A proper conversion tool accounts for daylight saving automatically." },
+  ],
+  10: [
+    { q: '"PDH" stands for:', options: ["Previous Day High", "Price Data History", "Primary Demand Handle", "Post Daily Hold"], correct: 0, explain: "PDH refers to the previous trading day's high price." },
+    { q: 'The "daily open" is:', options: ["The price at the start of the trading day, used as a reference point", "A guaranteed support level", "A type of leverage", "The closing price"], correct: 0, explain: "The open is simply the first price of the period, used as a reference." },
+    { q: "A useful question when reading daily/weekly context is:", options: ['"What important levels are above and below current price?"', '"How many candles are green today?"', '"What is the broker\'s phone number?"', '"What color is the chart background?"'], correct: 0, explain: "This question ties current price back to nearby reference levels." },
+    { q: "Do PDH/PDL/PWH/PWL levels guarantee price will reverse when touched?", options: ["No — they're reference points, not guarantees", "Yes, always", "Only on Mondays", "Only for stocks"], correct: 0, explain: "These are reference levels, not certainties about future price behavior." },
+    { q: '"PWL" stands for:', options: ["Previous Week Low", "Primary Weekly Leverage", "Post Week Loss", "Price Weekly Level"], correct: 0, explain: "PWL refers to the previous week's low price." },
+  ],
+  11: [
+    { q: "In a top-down approach, which timeframes are typically checked first?", options: ["The higher timeframes (like Daily/4H) for context", "The 1-minute chart first", "No particular order matters", "Only the weekly chart, nothing else"], correct: 0, explain: "Context is generally established on higher timeframes before narrowing down." },
+    { q: "Why might beginners be discouraged from trading the 1-minute chart?", options: ["Lower timeframes tend to contain more noise, which can be harder to interpret", "The 1-minute chart doesn't show real prices", "It's technically impossible to view", "It only works on weekends"], correct: 0, explain: "More noise on lower timeframes can make them harder to read reliably, especially for beginners." },
+    { q: "A top-down approach generally moves from:", options: ["Higher timeframes down to lower timeframes", "Lower timeframes up to higher timeframes only", "A single timeframe only", "Random timeframes each day"], correct: 0, explain: "The process starts broad and narrows down to more detail." },
+    { q: "What is the 1-hour chart often used for in a top-down approach?", options: ["Locating price relative to important levels identified on higher timeframes", "Ignoring all higher timeframe context", "Replacing the need for a daily chart entirely", "Determining leverage automatically"], correct: 0, explain: "The 1H chart bridges the broader context with more specific price action." },
+    { q: "Is a top-down sequence a strict, universal rule everyone must follow exactly?", options: ["No — it's a common example framework, not a mandatory rule", "Yes, it's the only correct method", "It's set by regulators", "It never varies by trader"], correct: 0, explain: "It's offered as a common example approach, not a rigid law." },
+  ],
+  12: [
+    { q: "In this educational sequence, what comes right after identifying a liquidity sweep?", options: ["Looking for displacement", "Immediately entering a trade", "Ignoring market structure", "Skipping straight to review"], correct: 0, explain: "Displacement is checked next as further evidence before moving on." },
+    { q: 'Why does the sequence include "define invalidation" before entering?', options: ["To know in advance what price action would mean the idea was wrong", "Because it's required by brokers", "To guarantee a win", "To calculate leverage automatically"], correct: 0, explain: "Defining invalidation ahead of time keeps a wrong idea from turning into a bigger loss." },
+    { q: "What's the purpose of reviewing a trade afterward (the last step)?", options: ["To learn from what happened, regardless of the outcome", "To guarantee future wins", "To avoid ever taking risk again", "It's optional and not useful"], correct: 0, explain: "Review is how the whole process actually improves over time, win or lose." },
+    { q: "Does following all 12 steps guarantee a winning trade?", options: ["No — it's an educational framework, not a guarantee", "Yes, it's foolproof", "Only if you use maximum leverage", "Only on the New York session"], correct: 0, explain: "Nothing in this course is presented as a guarantee — this sequence is an educational framework." },
+    { q: '"Establish context/bias" fits where in the sequence?', options: ["It's the very first step", "It's the very last step", "It doesn't matter when you do it", "It replaces risk management entirely"], correct: 0, explain: "Establishing context comes first — everything else builds on it." },
+  ],
+};
+
+const FLASHCARDS = [
+  { front: "Bid", back: "The highest price a buyer is currently willing to pay." },
+  { front: "Ask", back: "The lowest price a seller is currently willing to accept." },
+  { front: "Spread", back: "The gap between the bid price and the ask price." },
+  { front: "Stop Loss", back: "An order that automatically closes a losing trade at a chosen price." },
+  { front: "Leverage", back: "Trading a larger position than your own money would normally allow — magnifies gains and losses." },
+  { front: "Bullish Candle", back: "A candle that closes higher than it opened." },
+  { front: "Bearish Candle", back: "A candle that closes lower than it opened." },
+  { front: "Wick", back: "The thin line above or below a candle's body, showing the full high-to-low range." },
+  { front: "OHLC", back: "Open, High, Low, Close — the four prices every candle records." },
+  { front: "Swing High", back: "A local peak — a high point above the candles immediately around it." },
+  { front: "Swing Low", back: "A local dip — a low point below the candles immediately around it." },
+  { front: "Break of Structure", back: "Price closing beyond a prior swing point in the direction of the existing trend." },
+  { front: "MSS", back: "Market Structure Shift — a break in the opposite direction of the trend, hinting at a possible reversal." },
+  { front: "BSL", back: "Buy-Side Liquidity — resting orders that tend to sit above recent highs." },
+  { front: "SSL", back: "Sell-Side Liquidity — resting orders that tend to sit below recent lows." },
+  { front: "Liquidity Sweep", back: "A brief push through an obvious level to trigger resting orders, which may then reverse." },
+  { front: "FVG", back: "Fair Value Gap — a gap left between candle 1 and candle 3 during a fast three-candle move." },
+  { front: "Order Block", back: "The last opposite-direction candle before a strong displacement move." },
+  { front: "Equilibrium", back: "The 50% midpoint of a dealing range." },
+  { front: "Premium", back: "The upper half of a dealing range — relatively expensive." },
+  { front: "Discount", back: "The lower half of a dealing range — relatively cheap." },
+  { front: "Kill Zone", back: "A specific time window within a session that some traders pay closer attention to." },
+  { front: "PDH", back: "Previous Day High." },
+  { front: "PDL", back: "Previous Day Low." },
+  { front: "Daily Open", back: "The price at the very start of the trading day, used as a reference point." },
+];
+
+const CANDLES = [
+  { o: 90, h: 96, l: 88, c: 94 },
+  { o: 94, h: 95, l: 84, c: 86 },
+  { o: 86, h: 101, l: 85, c: 99 },
+  { o: 99, h: 103, l: 97, c: 98 },
+  { o: 98, h: 110, l: 96, c: 108 },
+];
+
+const STRUCTURE_POINTS = [
+  { x: 30, y: 170, type: "start" },
+  { x: 90, y: 70, type: "high" },
+  { x: 150, y: 120, type: "low" },
+  { x: 210, y: 40, type: "high" },
+  { x: 270, y: 95, type: "low" },
+  { x: 330, y: 15, type: "high" },
+];
+const CORRECT_HIGH_INDICES = [1, 3, 5];
+
+const BACKTEST_CANDLES = [
+  { o: 100, h: 104, l: 98, c: 102 },
+  { o: 102, h: 103, l: 96, c: 97 },
+  { o: 97, h: 99, l: 90, c: 92 },
+  { o: 92, h: 95, l: 88, c: 94 },
+  { o: 94, h: 106, l: 93, c: 104 },
+  { o: 104, h: 112, l: 102, c: 110 },
+  { o: 110, h: 111, l: 104, c: 105 },
+  { o: 105, h: 107, l: 98, c: 100 },
+  { o: 100, h: 101, l: 92, c: 94 },
+  { o: 94, h: 103, l: 93, c: 101 },
+];
+
+const SESSIONS = [
+  { name: "Sydney", tz: "Australia/Sydney", start: "07:00", end: "16:00" },
+  { name: "Tokyo", tz: "Asia/Tokyo", start: "09:00", end: "18:00" },
+  { name: "London", tz: "Europe/London", start: "08:00", end: "16:30" },
+  { name: "New York", tz: "America/New_York", start: "09:30", end: "16:00" },
+  { name: "London / New York Overlap (example)", tz: "America/New_York", start: "08:00", end: "11:00" },
+  { name: "New York AM Kill Zone (example)", tz: "America/New_York", start: "09:30", end: "11:00" },
+  { name: "New York PM Kill Zone (example)", tz: "America/New_York", start: "13:30", end: "16:00" },
+  { name: "London Kill Zone (example)", tz: "Europe/London", start: "07:00", end: "10:00" },
+];
+
+const DISPLAY_ZONES = [
+  { label: "New York", tz: "America/New_York" },
+  { label: "Chicago", tz: "America/Chicago" },
+  { label: "Los Angeles", tz: "America/Los_Angeles" },
+  { label: "London", tz: "Europe/London" },
+  { label: "Paris / Frankfurt", tz: "Europe/Paris" },
+  { label: "Dubai", tz: "Asia/Dubai" },
+  { label: "Mumbai", tz: "Asia/Kolkata" },
+  { label: "Singapore", tz: "Asia/Singapore" },
+  { label: "Tokyo", tz: "Asia/Tokyo" },
+  { label: "Sydney", tz: "Australia/Sydney" },
+  { label: "UTC", tz: "UTC" },
+];
+
+const INSTRUMENTS = [
+  { symbol: "NQ", name: "E-mini Nasdaq-100 futures", tickSize: 0.25, tickValue: 5 },
+  { symbol: "MNQ", name: "Micro E-mini Nasdaq-100 futures", tickSize: 0.25, tickValue: 0.5 },
+  { symbol: "ES", name: "E-mini S&P 500 futures", tickSize: 0.25, tickValue: 12.5 },
+  { symbol: "MES", name: "Micro E-mini S&P 500 futures", tickSize: 0.25, tickValue: 1.25 },
+];
+
+/* Flatten dictionary from CONCEPTS */
+const DICTIONARY = [];
+Object.keys(CONCEPTS).forEach((levelId) => {
+  const levelTitle = LEVELS.find((l) => l.id === Number(levelId)).title;
+  CONCEPTS[levelId].forEach((c) => DICTIONARY.push({ ...c, levelId: Number(levelId), levelTitle }));
+});
+
+/* ------------------------------- state ------------------------------- */
+
+const state = {
+  mode: "normal",
+  view: "dashboard",
+  activeLevel: null,
+  progress: { 0: "unlocked" },
+  result: null,
+  easierOpen: {},
+  candleSelected: null,
+  structureSelected: [],
+  structureChecked: false,
+  quiz: { index: 0, picked: null, showExplain: false, score: 0 },
+  flash: { queue: FLASHCARDS.map((_, i) => i), pos: 0, flipped: false },
+  dictQuery: "",
+  displayTz: (Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC",
+  journal: [],
+  journalDraft: { instrument: "", timeframe: "", session: "London", context: "", liquidity: "", setup: "", entry: "", stop: "", target: "", result: "win", followedRules: true, notes: "" },
+  backtest: { revealed: 3, guess: null, results: [] },
+  backtestSelected: null,
+  risk: { account: "25000", riskPct: "1", stopDistance: "10", pointValue: "5", result: null },
+  instrCalc: { symbol: "NQ", ticks: "10" },
+  daily: null,
+  cert: null,
+  stepsOpen: {},
+  textLarge: false,
+  dark: false,
+};
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function statusFor(level) {
+  if (state.progress[level.id]) return state.progress[level.id];
+  const idx = LEVELS.findIndex((l) => l.id === level.id);
+  const prev = LEVELS[idx - 1];
+  if (!prev) return "unlocked";
+  return state.progress[prev.id] === "mastered" ? "unlocked" : "locked";
+}
+function dotColor(status) {
+  return status === "mastered" ? "#1E8E5A" : status === "unlocked" ? "#C77F17" : "#B8B4A6";
+}
+function statusLabel(status) {
+  return status === "mastered" ? "Mastered" : status === "unlocked" ? "Learning" : "Locked";
+}
+
+/* --------------------------- timezone helpers --------------------------- */
+
+function tzOffsetMs(timeZone, date) {
+  const dtf = new Intl.DateTimeFormat("en-US", { timeZone, hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const parts = dtf.formatToParts(date).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
+  let hour = parts.hour === "24" ? 0 : Number(parts.hour);
+  const asUTC = Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), hour, Number(parts.minute), Number(parts.second));
+  return asUTC - date.getTime();
+}
+function todayInTz(timeZone) {
+  const dtf = new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" });
+  return dtf.format(new Date());
+}
+function zonedWallTimeToUtc(dateStr, timeStr, timeZone) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const [hh, mm] = timeStr.split(":").map(Number);
+  let guess = new Date(Date.UTC(y, m - 1, d, hh, mm, 0));
+  let offset = tzOffsetMs(timeZone, guess);
+  let utcInstant = guess.getTime() - offset;
+  offset = tzOffsetMs(timeZone, new Date(utcInstant));
+  utcInstant = guess.getTime() - offset;
+  return new Date(utcInstant);
+}
+function formatInTz(date, timeZone) {
+  return new Intl.DateTimeFormat("en-US", { timeZone, hour: "numeric", minute: "2-digit", hour12: true, month: "short", day: "numeric" }).format(date);
+}
+
+/* ------------------------------- actions ------------------------------- */
+
+function setMode(m) { state.mode = m; render(); }
+function goNav(view) { state.view = view; render(); }
+function toggleDark() { state.dark = !state.dark; document.body.classList.toggle("dark", state.dark); }
+function toggleTextLarge() { state.textLarge = !state.textLarge; document.body.classList.toggle("text-large", state.textLarge); }
+
+function openLevel(id) {
+  const level = LEVELS.find((l) => l.id === id);
+  const status = statusFor(level);
+  if (status === "locked") return;
+  state.activeLevel = id;
+  state.easierOpen = {};
+  state.stepsOpen = {};
+  state.view = "lesson";
+  render();
+}
+function backToDashboard() { state.view = "dashboard"; render(); }
+function backToLesson() { state.view = "lesson"; render(); }
+
+function toggleEasier(key) { state.easierOpen[key] = !state.easierOpen[key]; render(); }
+function toggleStep(i) { state.stepsOpen[i] = !state.stepsOpen[i]; render(); }
+
+function selectCandle(i) { state.candleSelected = i; render(); }
+
+function toggleStructurePoint(i) {
+  if (state.structureChecked) return;
+  const idx = state.structureSelected.indexOf(i);
+  if (idx === -1) state.structureSelected.push(i); else state.structureSelected.splice(idx, 1);
+  render();
+}
+function checkStructure() { state.structureChecked = true; render(); }
+function retryStructure() { state.structureChecked = false; state.structureSelected = []; render(); }
+
+function startQuiz() { state.quiz = { index: 0, picked: null, showExplain: false, score: 0 }; state.view = "quiz"; render(); }
+function quizChoose(idx) {
+  const q = QUIZZES[state.activeLevel][state.quiz.index];
+  if (state.quiz.showExplain) return;
+  state.quiz.picked = idx; state.quiz.showExplain = true;
+  if (idx === q.correct) state.quiz.score += 1;
+  render();
+}
+function quizNext() {
+  const questions = QUIZZES[state.activeLevel];
+  if (state.quiz.index + 1 < questions.length) {
+    state.quiz.index += 1; state.quiz.picked = null; state.quiz.showExplain = false; render();
+  } else { finishQuiz(); }
+}
+function finishQuiz() {
+  const total = QUIZZES[state.activeLevel].length;
+  const score = state.quiz.score;
+  const passed = score / total >= 0.8;
+  state.progress[state.activeLevel] = passed ? "mastered" : "unlocked";
+  state.result = { score, total, passed };
+  state.view = "result";
+  render();
+}
+
+function flipFlashcard() { state.flash.flipped = !state.flash.flipped; render(); }
+function flashRate(level) {
+  const f = state.flash;
+  const cardIdx = f.queue[f.pos % f.queue.length];
+  const insertAt = level === "hard" ? f.pos + 3 : level === "medium" ? f.pos + 6 : f.queue.length;
+  const newQueue = f.queue.slice();
+  newQueue.splice(f.pos, 1);
+  const clamped = Math.min(insertAt, newQueue.length);
+  newQueue.splice(clamped, 0, cardIdx);
+  f.queue = newQueue; f.flipped = false;
+  f.pos = (f.pos + 1) % Math.max(newQueue.length, 1);
+  render();
+}
+
+function setDictQuery(v) { state.dictQuery = v; render(); }
+
+function setDisplayTz(tz) { state.displayTz = tz; render(); }
+
+function updateDraft(section, field, value) { state[section][field] = value; }
+
+function addJournalEntry() {
+  const d = state.journalDraft;
+  const entry = Object.assign({}, d, { id: Date.now() });
+  state.journal.unshift(entry);
+  state.journalDraft = { instrument: "", timeframe: "", session: "London", context: "", liquidity: "", setup: "", entry: "", stop: "", target: "", result: "win", followedRules: true, notes: "" };
+  render();
+}
+function removeJournalEntry(id) {
+  state.journal = state.journal.filter((e) => e.id !== id);
+  render();
+}
+
+function selectBacktestCandle(i) { state.backtestSelected = i; render(); }
+function backtestGuess(direction) { state.backtest.guess = direction; render(); }
+function backtestReveal() {
+  const idx = state.backtest.revealed;
+  const candle = BACKTEST_CANDLES[idx];
+  const actual = candle.c >= candle.o ? "up" : "down";
+  const correct = actual === state.backtest.guess;
+  state.backtest.results.push({ idx, guess: state.backtest.guess, actual, correct });
+  state.backtest.revealed += 1;
+  state.backtest.guess = null;
+  render();
+}
+function backtestReset() { state.backtest = { revealed: 3, guess: null, results: [] }; state.backtestSelected = null; render(); }
+
+function calculateRisk() {
+  const account = parseFloat(state.risk.account) || 0;
+  const riskPct = parseFloat(state.risk.riskPct) || 0;
+  const stopDistance = parseFloat(state.risk.stopDistance) || 0;
+  const pointValue = parseFloat(state.risk.pointValue) || 0;
+  const maxRiskDollars = account * (riskPct / 100);
+  const perContractRisk = stopDistance * pointValue;
+  const suggestedSize = perContractRisk > 0 ? Math.floor(maxRiskDollars / perContractRisk) : 0;
+  state.risk.result = { maxRiskDollars, suggestedSize, perContractRisk };
+  render();
+}
+
+function calcInstrument() {
+  const inst = INSTRUMENTS.find((i) => i.symbol === state.instrCalc.symbol);
+  const ticks = parseFloat(state.instrCalc.ticks) || 0;
+  state.instrCalc.result = ticks * inst.tickValue;
+  render();
+}
+
+function generateDailyPractice() {
+  const pool = [];
+  Object.keys(QUIZZES).forEach((levelId) => {
+    QUIZZES[levelId].forEach((q) => pool.push(Object.assign({}, q, { levelId: Number(levelId), levelTitle: LEVELS.find((l) => l.id === Number(levelId)).title })));
+  });
+  const shuffled = pool.slice().sort(() => Math.random() - 0.5).slice(0, 5);
+  state.daily = { questions: shuffled, index: 0, picked: null, showExplain: false, score: 0, done: false };
+  state.view = "daily";
+  render();
+}
+function dailyChoose(idx) {
+  const q = state.daily.questions[state.daily.index];
+  if (state.daily.showExplain) return;
+  state.daily.picked = idx; state.daily.showExplain = true;
+  if (idx === q.correct) state.daily.score += 1;
+  render();
+}
+function dailyNext() {
+  if (state.daily.index + 1 < state.daily.questions.length) {
+    state.daily.index += 1; state.daily.picked = null; state.daily.showExplain = false; render();
+  } else { state.daily.done = true; render(); }
+}
+
+function startCertification() {
+  if (state.progress[12] !== "mastered") return;
+  const questions = LEVELS.map((level) => {
+    const q = QUIZZES[level.id][0];
+    return Object.assign({}, q, { levelId: level.id, levelTitle: level.title });
+  });
+  state.cert = { questions, index: 0, picked: null, showExplain: false, score: 0, done: false, breakdown: [] };
+  state.view = "cert";
+  render();
+}
+function certChoose(idx) {
+  const q = state.cert.questions[state.cert.index];
+  if (state.cert.showExplain) return;
+  state.cert.picked = idx; state.cert.showExplain = true;
+  const correct = idx === q.correct;
+  if (correct) state.cert.score += 1;
+  state.cert.breakdown.push({ levelTitle: q.levelTitle, correct });
+  render();
+}
+function certNext() {
+  if (state.cert.index + 1 < state.cert.questions.length) {
+    state.cert.index += 1; state.cert.picked = null; state.cert.showExplain = false; render();
+  } else { state.cert.done = true; render(); }
+}
+
+/* ------------------------------- rendering ------------------------------- */
+
+function renderConceptCard(concept, levelId, i) {
+  const key = levelId + "-" + i;
+  const isOpen = !!state.easierOpen[key];
+  const bodyText = state.mode === "simple" ? concept.simple : concept.normal;
+  return `
+    <div class="concept-card">
+      <h3 class="concept-term">${esc(concept.term)}</h3>
+      <p class="concept-body">${esc(bodyText)}</p>
+      ${isOpen ? `<div class="easier-box"><div class="easier-label">Even easier</div><p>${esc(concept.easier)}</p></div>` : ""}
+      <button class="easier-btn" onclick="toggleEasier('${key}')">${isOpen ? "Hide the easier version" : "Explain this even easier"}</button>
+      <div class="sub-row">
+        <div class="sub-box"><div class="sub-label">Example</div><p class="sub-text">${esc(concept.example)}</p></div>
+        <div class="sub-box"><div class="sub-label">What to look for</div><p class="sub-text">${esc(concept.lookFor)}</p></div>
+      </div>
+      <div class="mistake-box"><div class="mistake-label">Common mistake</div><p class="sub-text">${esc(concept.mistake)}</p></div>
+    </div>
+  `;
+}
+
+function renderCandleChart() {
+  const minP = Math.min(...CANDLES.map((c) => c.l)) - 3;
+  const maxP = Math.max(...CANDLES.map((c) => c.h)) + 3;
+  const scaleY = (p) => 190 - ((p - minP) / (maxP - minP)) * 180;
+  const width = 340;
+  const gap = width / CANDLES.length;
+  const svgParts = CANDLES.map((c, i) => {
+    const cx = gap * i + gap / 2;
+    const isUp = c.c >= c.o;
+    const bodyTop = scaleY(Math.max(c.o, c.c));
+    const bodyBottom = scaleY(Math.min(c.o, c.c));
+    const isSel = state.candleSelected === i;
+    const color = isUp ? "#1E8E5A" : "#C23B3B";
+    return `<g onclick="selectCandle(${i})"><line x1="${cx}" x2="${cx}" y1="${scaleY(c.h)}" y2="${scaleY(c.l)}" stroke="${color}" stroke-width="${isSel ? 2.5 : 1.5}" /><rect x="${cx - 12}" y="${bodyTop}" width="24" height="${Math.max(bodyBottom - bodyTop, 2)}" fill="${color}" opacity="${isSel ? 1 : 0.85}" stroke="${isSel ? "#2F4FD1" : "none"}" stroke-width="2" /></g>`;
+  }).join("");
+  let readout = `<span style="color:var(--ink-soft)">No candle selected yet.</span>`;
+  if (state.candleSelected !== null) {
+    const c = CANDLES[state.candleSelected];
+    const dir = c.c >= c.o ? "Bullish" : "Bearish";
+    const dirColor = c.c >= c.o ? "#1E8E5A" : "#C23B3B";
+    readout = `<span><strong>Candle ${state.candleSelected + 1}:</strong> Open ${c.o} · High ${c.h} · Low ${c.l} · Close ${c.c} — <strong style="color:${dirColor}">${dir}</strong></span>`;
+  }
+  return `<div class="interactive-box"><div class="interactive-title">Tap a candle to read its OHLC</div><svg width="100%" viewBox="0 0 ${width} 200" style="max-width:400px">${svgParts}</svg><div class="readout">${readout}</div></div>`;
+}
+
+function renderStructureChart() {
+  const checked = state.structureChecked;
+  const selected = state.structureSelected;
+  const pointColor = (i, type) => {
+    if (!checked) return selected.includes(i) ? "#2F4FD1" : type === "high" ? "#B8B4A6" : "#DCE0EA";
+    const isCorrectHigh = CORRECT_HIGH_INDICES.includes(i);
+    const wasSelected = selected.includes(i);
+    if (isCorrectHigh && wasSelected) return "#1E8E5A";
+    if (isCorrectHigh && !wasSelected) return "#C77F17";
+    if (!isCorrectHigh && wasSelected) return "#C23B3B";
+    return "#DCE0EA";
+  };
+  const pathD = STRUCTURE_POINTS.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+  const circles = STRUCTURE_POINTS.map((p, i) => {
+    const isStart = p.type === "start";
+    const fill = isStart ? "#C9C6BA" : pointColor(i, p.type);
+    return `<circle cx="${p.x}" cy="${p.y}" r="${isStart ? 5 : 9}" fill="${fill}" stroke="#1B1D1F" stroke-width="${isStart ? 0 : 1}" ${isStart ? "" : `onclick="toggleStructurePoint(${i})"`} />`;
+  }).join("");
+  const allCorrect = checked && CORRECT_HIGH_INDICES.every((i) => selected.includes(i)) && selected.every((i) => CORRECT_HIGH_INDICES.includes(i));
+  let feedback = "";
+  if (checked) {
+    feedback = allCorrect
+      ? `<div class="readout"><span style="color:#1E8E5A">Exactly right — those are the swing highs.</span></div>`
+      : `<div class="readout"><span style="color:#8A4B12">Not quite. Green = correct pick, gold = a swing high you missed, red = not actually a swing high.</span></div>`;
+  }
+  return `
+    <div class="interactive-box">
+      <div class="interactive-title">Click every swing high, then check your answer</div>
+      <svg width="100%" viewBox="0 0 360 200" style="max-width:400px"><path d="${pathD}" fill="none" stroke="#C9C6BA" stroke-width="2" />${circles}</svg>
+      <div class="row-btns">
+        <button class="small-btn" onclick="checkStructure()" ${checked ? "disabled" : ""}>Check answer</button>
+        ${checked ? `<button class="small-btn-ghost" onclick="retryStructure()">Try again</button>` : ""}
+      </div>
+      ${feedback}
+    </div>
+  `;
+}
+
+function renderPremiumDiscountTool() {
+  if (state.pdSlider === undefined) state.pdSlider = 50;
+  const low = 100, high = 120;
+  const price = low + ((high - low) * state.pdSlider) / 100;
+  const zone = state.pdSlider > 55 ? "Premium" : state.pdSlider < 45 ? "Discount" : "Equilibrium";
+  const zoneColor = zone === "Premium" ? "#C23B3B" : zone === "Discount" ? "#1E8E5A" : "#C77F17";
+  return `
+    <div class="interactive-box">
+      <div class="interactive-title">Drag to move price through an example 100–120 dealing range</div>
+      <input type="range" min="0" max="100" value="${state.pdSlider}" oninput="movePdSlider(this.value)" style="width:100%" />
+      <div class="readout">Price: <strong>${price.toFixed(1)}</strong> — Zone: <strong style="color:${zoneColor}">${zone}</strong></div>
+      <div class="sub-row" style="margin-top:10px">
+        <div class="sub-box"><div class="sub-label">Range high</div><p class="sub-text">120 (Premium above 110)</p></div>
+        <div class="sub-box"><div class="sub-label">Range low</div><p class="sub-text">100 (Discount below 110)</p></div>
+      </div>
+    </div>
+  `;
+}
+function movePdSlider(v) { state.pdSlider = Number(v); render(); }
+
+function renderModelSteps() {
+  return ICT_MODEL_STEPS.map((step, i) => {
+    const open = !!state.stepsOpen[i];
+    return `
+      <div class="step-card">
+        <div class="step-head" onclick="toggleStep(${i})">
+          <div class="step-num">${i + 1}</div>
+          <div class="step-title">${esc(step.title)}</div>
+        </div>
+        ${open ? `<div class="step-why"><strong>Why?</strong> ${esc(step.why)}</div>` : `<div style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;margin-left:36px">Tap for "Why?"</div>`}
+      </div>
+    `;
+  }).join("");
+}
+
+function renderQuiz() {
+  const questions = QUIZZES[state.activeLevel];
+  const q = questions[state.quiz.index];
+  const picked = state.quiz.picked;
+  const showExplain = state.quiz.showExplain;
+  const options = q.options.map((opt, idx) => {
+    let cls = "quiz-option";
+    if (showExplain) { if (idx === q.correct) cls += " correct"; else if (idx === picked) cls += " incorrect"; }
+    return `<button class="${cls}" onclick="quizChoose(${idx})">${esc(opt)}</button>`;
+  }).join("");
+  return `
+    <div class="quiz-wrap">
+      <div class="quiz-progress">Question ${state.quiz.index + 1} of ${questions.length}</div>
+      <h3 style="margin-top:8px">${esc(q.q)}</h3>
+      <div>${options}</div>
+      ${showExplain ? `<div class="quiz-explain">${picked === q.correct ? "Correct. " : "That's okay — let's look again. "}${esc(q.explain)}</div>` : ""}
+      ${showExplain ? `<button class="small-btn" onclick="quizNext()">${state.quiz.index + 1 < questions.length ? "Next question" : "See results"}</button>` : ""}
+    </div>
+  `;
+}
+
+function renderFlashcards() {
+  const f = state.flash;
+  const cardIdx = f.queue[f.pos % f.queue.length];
+  const card = FLASHCARDS[cardIdx];
+  return `
+    <h1>Flashcards</h1>
+    <p class="muted">Cards you mark "Hard" come back sooner. There are ${FLASHCARDS.length} terms in this deck.</p>
+    <div class="flash-outer" onclick="flipFlashcard()">
+      <div class="flash-label">${f.flipped ? "Definition" : "Term"} · tap to flip</div>
+      <div class="flash-text">${esc(f.flipped ? card.back : card.front)}</div>
+    </div>
+    ${f.flipped ? `
+      <div class="row-btns">
+        <button class="small-btn" style="background:#C23B3B" onclick="flashRate('hard')">Hard</button>
+        <button class="small-btn" style="background:#C77F17" onclick="flashRate('medium')">Medium</button>
+        <button class="small-btn" style="background:#1E8E5A" onclick="flashRate('easy')">Easy</button>
+      </div>` : ""}
+  `;
+}
+
+function renderDashboard() {
+  const cards = LEVELS.map((level) => {
+    const status = statusFor(level);
+    const locked = status === "locked";
+    return `
+      <button class="level-card ${locked ? "locked" : ""}" onclick="openLevel(${level.id})" ${locked ? "disabled" : ""}>
+        <div class="level-num">Level ${level.id}</div>
+        <div class="level-title">${esc(level.title)}</div>
+        <div class="level-tagline">${esc(level.tagline)}</div>
+        <div class="status-dot-row"><span class="status-dot" style="background:${dotColor(status)}"></span>${statusLabel(status)}</div>
+      </button>
+    `;
+  }).join("");
+  return `<h1>Course</h1><p class="muted">Work through each level in order. You need 80% on a quiz to unlock the next one.</p><div class="level-grid">${cards}</div>`;
+}
+
+function renderLesson() {
+  const level = LEVELS.find((l) => l.id === state.activeLevel);
+  let body;
+  if (state.activeLevel === 12) {
+    body = renderModelSteps();
+  } else {
+    body = CONCEPTS[state.activeLevel].map((c, i) => renderConceptCard(c, state.activeLevel, i)).join("");
+  }
+  let interactive = "";
+  if (state.activeLevel === 1) interactive = renderCandleChart();
+  if (state.activeLevel === 3) interactive = renderStructureChart();
+  if (state.activeLevel === 7) interactive = renderPremiumDiscountTool();
+  return `
+    <button class="back-btn" onclick="backToDashboard()">← Back to course</button>
+    <h1>Level ${level.id} — ${esc(level.title)}</h1>
+    ${body}
+    ${interactive}
+    <button class="primary-btn" onclick="startQuiz()">Take the Level ${level.id} quiz</button>
+  `;
+}
+
+function renderResult() {
+  const r = state.result;
+  const isFinalLevel = state.activeLevel === 12 && r.passed;
+  return `
+    <div class="result-box">
+      <h1>${r.passed ? "Level mastered" : "Not quite yet"}</h1>
+      <p class="muted">You scored ${r.score} of ${r.total} (${Math.round((r.score / r.total) * 100)}%).</p>
+      <p class="muted">${r.passed ? "The next level is now unlocked." : "You need 80% to unlock the next level. Review the lesson and try again — there's no limit on attempts."}</p>
+      ${isFinalLevel ? `<p class="muted"><strong>The ICT Learning Mastery Test is now unlocked</strong> — find it in the Certification tab.</p>` : ""}
+      <div class="row-btns">
+        <button class="primary-btn" onclick="backToLesson()">Review lesson</button>
+        <button class="small-btn-ghost" onclick="backToDashboard()">Back to course</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderDictionary() {
+  const q = state.dictQuery.trim().toLowerCase();
+  const results = q ? DICTIONARY.filter((d) => d.term.toLowerCase().includes(q) || d.normal.toLowerCase().includes(q)) : DICTIONARY;
+  const entries = results.map((d) => `
+    <div class="dict-entry">
+      <div class="dict-cat">${esc(d.levelTitle)}</div>
+      <div class="dict-term">${esc(d.term)}</div>
+      <div class="dict-def">${esc(d.normal)}</div>
+    </div>
+  `).join("") || `<p class="muted">No terms matched "${esc(state.dictQuery)}".</p>`;
+  return `
+    <h1>ICT Dictionary</h1>
+    <p class="muted">Search any term covered across the course. ${DICTIONARY.length} terms indexed.</p>
+    <input class="dict-search" type="text" placeholder="Search a trading term…" value="${esc(state.dictQuery)}" oninput="setDictQuery(this.value)" />
+    ${entries}
+  `;
+}
+
+function renderSessionClock() {
+  const now = new Date();
+  const zoneOptions = DISPLAY_ZONES.map((z) => `<option value="${z.tz}" ${z.tz === state.displayTz ? "selected" : ""}>${esc(z.label)}</option>`).join("");
+  const rows = SESSIONS.map((s) => {
+    const dateStr = todayInTz(s.tz);
+    const startUtc = zonedWallTimeToUtc(dateStr, s.start, s.tz);
+    let endUtc = zonedWallTimeToUtc(dateStr, s.end, s.tz);
+    if (endUtc <= startUtc) endUtc = new Date(endUtc.getTime() + 24 * 3600 * 1000);
+    const isOpen = now >= startUtc && now <= endUtc;
+    return `
+      <tr>
+        <td>${esc(s.name)}</td>
+        <td>${formatInTz(startUtc, state.displayTz)}</td>
+        <td>${formatInTz(endUtc, state.displayTz)}</td>
+        <td><span class="pill ${isOpen ? "open" : "closed"}">${isOpen ? "Open now" : "Closed"}</span></td>
+      </tr>
+    `;
+  }).join("");
+  return `
+    <h1>Session Clock</h1>
+    <p class="muted">Times are converted to your selected timezone automatically, accounting for daylight saving.</p>
+    <div class="form-field" style="max-width:280px;margin-bottom:16px">
+      <label>Show times in</label>
+      <select onchange="setDisplayTz(this.value)">${zoneOptions}</select>
+    </div>
+    <table class="session-table">
+      <thead><tr><th>Session</th><th>Starts</th><th>Ends</th><th>Status</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function renderJournal() {
+  const d = state.journalDraft;
+  const total = state.journal.length;
+  const wins = state.journal.filter((e) => e.result === "win").length;
+  const rulesFollowed = state.journal.filter((e) => e.followedRules).length;
+  const winRate = total ? Math.round((wins / total) * 100) : 0;
+  const rulePct = total ? Math.round((rulesFollowed / total) * 100) : 0;
+
+  const entries = state.journal.map((e) => `
+    <div class="journal-entry">
+      <div class="row"><strong>${esc(e.instrument || "—")} · ${esc(e.timeframe || "—")}</strong><span>${esc(e.result)}</span></div>
+      <div class="muted" style="margin:4px 0">${esc(e.session)} session — ${esc(e.setup || "no setup notes")}</div>
+      <div class="muted" style="margin:0">Entry ${esc(e.entry || "—")} · Stop ${esc(e.stop || "—")} · Target ${esc(e.target || "—")}</div>
+      ${e.notes ? `<div class="muted" style="margin-top:6px">"${esc(e.notes)}"</div>` : ""}
+      <button class="small-btn-ghost" style="margin-top:8px" onclick="removeJournalEntry(${e.id})">Delete</button>
+    </div>
+  `).join("") || `<p class="muted">No journal entries yet — this is a simulated/educational journal, not a real trading account.</p>`;
+
+  return `
+    <h1>Trading Journal</h1>
+    <p class="muted">Educational and simulated only. Entries exist only for this session and are not saved after you close the page.</p>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Entries</div></div>
+      <div class="stat-card"><div class="stat-num">${winRate}%</div><div class="stat-label">Win rate</div></div>
+      <div class="stat-card"><div class="stat-num">${rulePct}%</div><div class="stat-label">Followed rules</div></div>
+    </div>
+    <h2>New entry</h2>
+    <div class="form-grid">
+      <div class="form-field"><label>Instrument</label><input type="text" value="${esc(d.instrument)}" oninput="updateDraft('journalDraft','instrument',this.value)" placeholder="e.g. NQ" /></div>
+      <div class="form-field"><label>Timeframe</label><input type="text" value="${esc(d.timeframe)}" oninput="updateDraft('journalDraft','timeframe',this.value)" placeholder="e.g. 15M" /></div>
+      <div class="form-field"><label>Session</label><select onchange="updateDraft('journalDraft','session',this.value)">
+        ${["London", "New York", "Tokyo", "Sydney", "Overlap"].map((s) => `<option ${d.session === s ? "selected" : ""}>${s}</option>`).join("")}
+      </select></div>
+      <div class="form-field"><label>Setup</label><input type="text" value="${esc(d.setup)}" oninput="updateDraft('journalDraft','setup',this.value)" placeholder="e.g. Sweep + MSS + FVG" /></div>
+      <div class="form-field"><label>Entry</label><input type="text" value="${esc(d.entry)}" oninput="updateDraft('journalDraft','entry',this.value)" /></div>
+      <div class="form-field"><label>Stop</label><input type="text" value="${esc(d.stop)}" oninput="updateDraft('journalDraft','stop',this.value)" /></div>
+      <div class="form-field"><label>Target</label><input type="text" value="${esc(d.target)}" oninput="updateDraft('journalDraft','target',this.value)" /></div>
+      <div class="form-field"><label>Result</label><select onchange="updateDraft('journalDraft','result',this.value)">
+        ${["win", "loss", "breakeven"].map((r) => `<option ${d.result === r ? "selected" : ""}>${r}</option>`).join("")}
+      </select></div>
+    </div>
+    <div class="form-field" style="margin-bottom:10px">
+      <label>What I learned</label>
+      <textarea rows="2" oninput="updateDraft('journalDraft','notes',this.value)" placeholder="Notes on this simulated trade">${esc(d.notes)}</textarea>
+    </div>
+    <button class="primary-btn" onclick="addJournalEntry()">Add entry</button>
+    <h2 style="margin-top:24px">Entries</h2>
+    ${entries}
+  `;
+}
+
+function renderBacktestChart() {
+  const revealed = BACKTEST_CANDLES.slice(0, state.backtest.revealed);
+  const minP = Math.min(...BACKTEST_CANDLES.map((c) => c.l)) - 3;
+  const maxP = Math.max(...BACKTEST_CANDLES.map((c) => c.h)) + 3;
+  const scaleY = (p) => 190 - ((p - minP) / (maxP - minP)) * 180;
+  const width = Math.max(340, revealed.length * 40);
+  const gap = width / BACKTEST_CANDLES.length;
+  const svgParts = revealed.map((c, i) => {
+    const cx = gap * i + gap / 2;
+    const isUp = c.c >= c.o;
+    const bodyTop = scaleY(Math.max(c.o, c.c));
+    const bodyBottom = scaleY(Math.min(c.o, c.c));
+    const color = isUp ? "#1E8E5A" : "#C23B3B";
+    const isSel = state.backtestSelected === i;
+    return `<g onclick="selectBacktestCandle(${i})"><line x1="${cx}" x2="${cx}" y1="${scaleY(c.h)}" y2="${scaleY(c.l)}" stroke="${color}" stroke-width="${isSel ? 2.5 : 1.5}" /><rect x="${cx - 10}" y="${bodyTop}" width="20" height="${Math.max(bodyBottom - bodyTop, 2)}" fill="${color}" opacity="${isSel ? 1 : 0.85}" /></g>`;
+  }).join("");
+  let readout = `<span style="color:var(--ink-soft)">Tap a candle to read its OHLC.</span>`;
+  if (state.backtestSelected !== null && state.backtestSelected < revealed.length) {
+    const c = revealed[state.backtestSelected];
+    readout = `<span>Open ${c.o} · High ${c.h} · Low ${c.l} · Close ${c.c}</span>`;
+  }
+  return `<svg width="100%" viewBox="0 0 ${width} 200" style="max-width:100%">${svgParts}</svg><div class="readout">${readout}</div>`;
+}
+
+function renderBacktest() {
+  const bt = state.backtest;
+  const isDone = bt.revealed >= BACKTEST_CANDLES.length;
+  const correctCount = bt.results.filter((r) => r.correct).length;
+  return `
+    <h1>Backtesting Lab</h1>
+    <p class="muted">Guess the direction of the next hidden candle before it's revealed, one at a time.</p>
+    <div class="interactive-box">
+      ${renderBacktestChart()}
+      ${!isDone ? `
+        ${bt.guess === null ? `
+          <div class="row-btns">
+            <button class="small-btn" style="background:#1E8E5A" onclick="backtestGuess('up')">Guess: Next candle bullish</button>
+            <button class="small-btn" style="background:#C23B3B" onclick="backtestGuess('down')">Guess: Next candle bearish</button>
+          </div>
+        ` : `
+          <div class="row-btns"><button class="primary-btn" onclick="backtestReveal()">Reveal next candle</button></div>
+        `}
+      ` : `
+        <div class="readout"><strong>Final score: ${correctCount} of ${bt.results.length} correct guesses.</strong></div>
+        <p class="muted" style="margin-top:8px">Past performance does not guarantee future results — this exercise is for practicing reading price action without seeing the future, not for predicting it.</p>
+        <button class="small-btn-ghost" onclick="backtestReset()">Start over</button>
+      `}
+    </div>
+    ${bt.results.length ? `
+      <h2>Your guesses so far</h2>
+      ${bt.results.map((r, i) => `<div class="muted">Candle ${r.idx + 1}: guessed ${r.guess}, actual ${r.actual} — ${r.correct ? "correct" : "incorrect"}</div>`).join("")}
+    ` : ""}
+  `;
+}
+
+function renderRiskTools() {
+  const r = state.risk;
+  const result = r.result;
+  return `
+    <h1>Risk Management Tools</h1>
+    <p class="muted">Hypothetical, educational calculators only — not a recommendation for any real account.</p>
+    <div class="form-grid">
+      <div class="form-field"><label>Account size ($)</label><input type="number" value="${esc(r.account)}" oninput="updateDraft('risk','account',this.value)" /></div>
+      <div class="form-field"><label>Risk per trade (%)</label><input type="number" value="${esc(r.riskPct)}" oninput="updateDraft('risk','riskPct',this.value)" /></div>
+      <div class="form-field"><label>Stop distance (points)</label><input type="number" value="${esc(r.stopDistance)}" oninput="updateDraft('risk','stopDistance',this.value)" /></div>
+      <div class="form-field"><label>Point value ($ per point)</label><input type="number" value="${esc(r.pointValue)}" oninput="updateDraft('risk','pointValue',this.value)" /></div>
+    </div>
+    <button class="primary-btn" onclick="calculateRisk()">Calculate</button>
+    ${result ? `
+      <div class="stat-grid" style="margin-top:16px">
+        <div class="stat-card"><div class="stat-num">$${result.maxRiskDollars.toFixed(2)}</div><div class="stat-label">Max hypothetical risk</div></div>
+        <div class="stat-card"><div class="stat-num">$${result.perContractRisk.toFixed(2)}</div><div class="stat-label">Risk per contract</div></div>
+        <div class="stat-card"><div class="stat-num">${result.suggestedSize}</div><div class="stat-label">Hypothetical position size</div></div>
+      </div>
+    ` : ""}
+  `;
+}
+
+function renderInstruments() {
+  const rows = INSTRUMENTS.map((i) => `<tr><td>${i.symbol}</td><td>${i.name}</td><td>${i.tickSize}</td><td>$${i.tickValue.toFixed(2)}</td></tr>`).join("");
+  const options = INSTRUMENTS.map((i) => `<option value="${i.symbol}" ${state.instrCalc.symbol === i.symbol ? "selected" : ""}>${i.symbol}</option>`).join("");
+  return `
+    <h1>Instrument Reference</h1>
+    <p class="muted">Contract values differ by instrument — never assume they're the same across markets.</p>
+    <table class="table-ref">
+      <thead><tr><th>Symbol</th><th>Name</th><th>Tick size</th><th>Tick value</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <h2>Tick value calculator</h2>
+    <div class="form-grid">
+      <div class="form-field"><label>Instrument</label><select onchange="updateDraft('instrCalc','symbol',this.value)">${options}</select></div>
+      <div class="form-field"><label>Number of ticks</label><input type="number" value="${esc(state.instrCalc.ticks)}" oninput="updateDraft('instrCalc','ticks',this.value)" /></div>
+    </div>
+    <button class="primary-btn" onclick="calcInstrument()">Calculate</button>
+    ${state.instrCalc.result !== undefined ? `<div class="readout" style="margin-top:12px"><strong>${esc(state.instrCalc.ticks)} ticks on ${esc(state.instrCalc.symbol)} ≈ $${Number(state.instrCalc.result).toFixed(2)}</strong></div>` : ""}
+  `;
+}
+
+function renderDailyIntro() {
+  return `
+    <h1>10-Minute Daily Practice</h1>
+    <p class="muted">A fresh mix of 5 questions pulled from across the whole course. This set regenerates each time you visit.</p>
+    <button class="primary-btn" onclick="generateDailyPractice()">Start today's practice</button>
+  `;
+}
+function renderDaily() {
+  const d = state.daily;
+  if (d.done) {
+    return `
+      <div class="result-box">
+        <h1>Today's score: ${d.score}/${d.questions.length}</h1>
+        <p class="muted">Review any topics you missed, then come back for a new mix any time.</p>
+        <button class="primary-btn" onclick="generateDailyPractice()">Try another set</button>
+      </div>
+    `;
+  }
+  const q = d.questions[d.index];
+  const options = q.options.map((opt, idx) => {
+    let cls = "quiz-option";
+    if (d.showExplain) { if (idx === q.correct) cls += " correct"; else if (idx === d.picked) cls += " incorrect"; }
+    return `<button class="${cls}" onclick="dailyChoose(${idx})">${esc(opt)}</button>`;
+  }).join("");
+  return `
+    <h1>Daily Practice</h1>
+    <div class="quiz-wrap">
+      <div class="quiz-progress">Question ${d.index + 1} of ${d.questions.length} · ${esc(q.levelTitle)}</div>
+      <h3 style="margin-top:8px">${esc(q.q)}</h3>
+      <div>${options}</div>
+      ${d.showExplain ? `<div class="quiz-explain">${d.picked === q.correct ? "Correct. " : "Not quite. "}${esc(q.explain)}</div>` : ""}
+      ${d.showExplain ? `<button class="small-btn" onclick="dailyNext()">${d.index + 1 < d.questions.length ? "Next" : "See today's score"}</button>` : ""}
+    </div>
+  `;
+}
+
+function renderCertIntro() {
+  const mastered = state.progress[12] === "mastered";
+  return `
+    <h1>ICT Learning Mastery Test</h1>
+    ${mastered ? `
+      <p class="muted">A comprehensive test covering all 13 levels — one question from each. Score 80% or higher to complete it.</p>
+      <button class="primary-btn" onclick="startCertification()">Begin the mastery test</button>
+    ` : `
+      <p class="muted">This test unlocks once you've mastered Level 12 (The ICT 2022 Model). Keep working through the course to get there.</p>
+    `}
+  `;
+}
+function renderCert() {
+  const c = state.cert;
+  if (c.done) {
+    const pct = Math.round((c.score / c.questions.length) * 100);
+    const byLevel = {};
+    c.breakdown.forEach((b) => { byLevel[b.levelTitle] = byLevel[b.levelTitle] || { right: 0, total: 0 }; byLevel[b.levelTitle].total += 1; if (b.correct) byLevel[b.levelTitle].right += 1; });
+    const strongest = Object.keys(byLevel).filter((k) => byLevel[k].right === byLevel[k].total);
+    const weakest = Object.keys(byLevel).filter((k) => byLevel[k].right < byLevel[k].total);
+    return `
+      <div class="result-box">
+        <h1>ICT Learning Mastery Test — ${pct}%</h1>
+        <p class="muted">You scored ${c.score} of ${c.questions.length}. This is a learning milestone, not a professional trading certification.</p>
+        ${strongest.length ? `<h2>Strongest areas</h2><p class="muted">${strongest.map(esc).join(", ")}</p>` : ""}
+        ${weakest.length ? `<h2>Areas to review</h2><p class="muted">${weakest.map(esc).join(", ")}</p>` : ""}
+        <button class="small-btn-ghost" onclick="startCertification()">Retake the test</button>
+      </div>
+    `;
+  }
+  const q = c.questions[c.index];
+  const options = q.options.map((opt, idx) => {
+    let cls = "quiz-option";
+    if (c.showExplain) { if (idx === q.correct) cls += " correct"; else if (idx === c.picked) cls += " incorrect"; }
+    return `<button class="${cls}" onclick="certChoose(${idx})">${esc(opt)}</button>`;
+  }).join("");
+  return `
+    <h1>ICT Learning Mastery Test</h1>
+    <div class="quiz-wrap">
+      <div class="quiz-progress">Question ${c.index + 1} of ${c.questions.length} · ${esc(q.levelTitle)}</div>
+      <h3 style="margin-top:8px">${esc(q.q)}</h3>
+      <div>${options}</div>
+      ${c.showExplain ? `<div class="quiz-explain">${c.picked === q.correct ? "Correct. " : "Not quite. "}${esc(q.explain)}</div>` : ""}
+      ${c.showExplain ? `<button class="small-btn" onclick="certNext()">${c.index + 1 < c.questions.length ? "Next" : "See results"}</button>` : ""}
+    </div>
+  `;
+}
+
+function renderSettings() {
+  return `
+    <h1>Settings</h1>
+    <div class="settings-row"><span>Dark mode</span><button class="icon-btn" onclick="toggleDark(); render()">${state.dark ? "On" : "Off"}</button></div>
+    <div class="settings-row"><span>Larger text</span><button class="icon-btn" onclick="toggleTextLarge(); render()">${state.textLarge ? "On" : "Off"}</button></div>
+    <p class="muted" style="margin-top:16px">This app avoids unnecessary animation, uses a single readable typeface throughout, and supports keyboard navigation on all buttons and links.</p>
+  `;
+}
+
+function computePct() {
+  const masteredCount = Object.values(state.progress).filter((s) => s === "mastered").length;
+  return Math.round((masteredCount / LEVELS.length) * 100);
+}
+
+const NAV_ITEMS = [
+  { key: "dashboard", label: "Learn" },
+  { key: "dictionary", label: "Dictionary" },
+  { key: "flashcards", label: "Flashcards" },
+  { key: "sessionclock", label: "Session Clock" },
+  { key: "backtest", label: "Chart Lab" },
+  { key: "journal", label: "Journal" },
+  { key: "risk", label: "Risk Tools" },
+  { key: "instruments", label: "Instruments" },
+  { key: "dailyintro", label: "Daily Practice" },
+  { key: "certintro", label: "Certification" },
+  { key: "settings", label: "Settings" },
+];
+
+function render() {
+  const pct = computePct();
+  let body = "";
+  if (state.view === "dashboard") body = renderDashboard();
+  else if (state.view === "lesson") body = renderLesson();
+  else if (state.view === "quiz") body = `<button class="back-btn" onclick="backToLesson()">← Back to lesson</button>${renderQuiz()}`;
+  else if (state.view === "result") body = renderResult();
+  else if (state.view === "flashcards") body = renderFlashcards();
+  else if (state.view === "dictionary") body = renderDictionary();
+  else if (state.view === "sessionclock") body = renderSessionClock();
+  else if (state.view === "journal") body = renderJournal();
+  else if (state.view === "backtest") body = renderBacktest();
+  else if (state.view === "risk") body = renderRiskTools();
+  else if (state.view === "instruments") body = renderInstruments();
+  else if (state.view === "dailyintro") body = renderDailyIntro();
+  else if (state.view === "daily") body = renderDaily();
+  else if (state.view === "certintro") body = renderCertIntro();
+  else if (state.view === "cert") body = renderCert();
+  else if (state.view === "settings") body = renderSettings();
+
+  const navHtml = NAV_ITEMS.map((n) => {
+    const isActive = state.view === n.key || (n.key === "dashboard" && (state.view === "lesson" || state.view === "quiz" || state.view === "result"));
+    return `<button class="nav-btn ${isActive ? "active" : ""}" onclick="goNav('${n.key}')">${esc(n.label)}</button>`;
+  }).join("");
+
+  document.getElementById("root").innerHTML = `
+    <div class="app">
+      <header class="header">
+        <div>
+          <div class="brand-row"><span class="brand-mark">ICT</span><span class="brand-name">Trading Academy</span></div>
+          <div class="progress-row">
+            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <span class="progress-label">${pct}% of the course mastered</span>
+          </div>
+        </div>
+        <div class="header-controls">
+          <div class="mode-toggle">
+            <button class="mode-btn ${state.mode === "normal" ? "active" : ""}" onclick="setMode('normal')">Normal</button>
+            <button class="mode-btn ${state.mode === "simple" ? "active" : ""}" onclick="setMode('simple')">Super Simple</button>
+          </div>
+        </div>
+      </header>
+      <nav class="nav">${navHtml}</nav>
+      <main class="main">${body}</main>
+      <footer class="footer">Educational content only — nothing here is financial advice or a guaranteed signal.</footer>
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
